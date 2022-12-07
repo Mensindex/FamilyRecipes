@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">Family recipes</string>
+
+    //Buttons text
+    <string name="add">Add</string>
+    <string name="profile">Profile</string>
+    <string name="categories">Categories</string>
+
+    //Field text
+    <string name="empty_string" />
+    <string name="search">Search a recipe…</string>
+
+    //Label text
+    <string name="all_recipes">All recipes</string>
 </resources>

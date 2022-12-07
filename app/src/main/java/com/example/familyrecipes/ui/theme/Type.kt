@@ -26,6 +26,11 @@ val Typography = Typography(
         fontSize = 18.sp,
         fontWeight = FontWeight.Bold,
     ),
+    labelLarge = TextStyle(
+        fontFamily = Comfortaa,
+        fontSize = 14.sp,
+        fontWeight = FontWeight.Bold,
+    ),
     bodyLarge = TextStyle(
         fontFamily = Comfortaa,
         fontSize = 16.sp,
