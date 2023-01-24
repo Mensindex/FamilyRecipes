@@ -31,8 +31,14 @@ fun MainScreenTest() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen() {
-    val recipeList: List<String> = listOf(
-        "f", "f", "f", "f", "f", "f", "f", "f", "f", "f", "f", "f", "f"
+    val myRecipeList = mutableListOf<String>(
+        "Granny’s cake",
+        "Smoky braised brisket",
+        "Sticky bourbon BBQ wings with blue cheese dip",
+        "Corndogs",
+        "Pecan pie with maple cream",
+        "Beef soup",
+        "American pancakes",
     )
     Scaffold(
         containerColor = Color.White,
@@ -71,7 +77,7 @@ fun MainScreen() {
                         LargeAddButton()
                         CustomInputField(
                             modifier = Modifier.weight(0.7f),
-                            hintText = stringResource(id = R.string.search),
+                            hintText = stringResource(id = R.string.search_a_recipe___),
                             icon = {
                                 Icon(
                                     painter = painterResource(id = R.drawable.search),
@@ -80,6 +86,9 @@ fun MainScreen() {
                                     modifier = Modifier
                                 )
                             }
+                        ,
+                            text = "",
+                            onValueChange = {}
                         )
                     }
                     Spacer(modifier = Modifier
@@ -107,9 +116,9 @@ fun MainScreen() {
                         .height(dimensionResource(id = R.dimen.dp16)))
                 }
                 items(
-                    items = recipeList,
+                    items = myRecipeList,
                     itemContent = { item ->
-                        RecipeCard()
+                        RecipeCard(item)
                         Spacer(modifier = Modifier
                             .height(dimensionResource(id = R.dimen.dp12)))
                     })

@@ -24,18 +24,18 @@ import com.example.familyrecipes.ui.theme.Typography
 
 @Preview(showBackground = true)
 @Composable
-fun RecipeCardPreview(){
-    RecipeCard()
+fun RecipeCardPreview() {
+    RecipeCard("Granny's cake")
 }
 
 
 @Composable
-fun RecipeCard() {
+fun RecipeCard(recipeName: String) {
     Card(
         modifier = Modifier
             .height(dimensionResource(id = R.dimen.recipe_card_height))
             .fillMaxWidth()
-            .graphicsLayer {  }
+            .graphicsLayer { }
             .shadow(
                 elevation = dimensionResource(id = R.dimen.dp8),
                 ambientColor = Color.Gray,
@@ -64,7 +64,8 @@ fun RecipeCard() {
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.dp8))
             ) {
                 Text(
-                    text = "Granny's cake",
+                    text = recipeName,
+                    maxLines = 1,
                     style = Typography.bodyLarge,
                     color = Color.Black,
                 )
@@ -83,7 +84,7 @@ fun RecipeCard() {
                         modifier = Modifier
                             .padding(bottom = dimensionResource(id = R.dimen.dp2)),
                         text = "1h 40m",
-                        style = Typography.bodyMedium,
+                        style = Typography.labelMedium,
                         color = Heather,
                     )
                 }
