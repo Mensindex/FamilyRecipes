@@ -1,3 +1,44 @@
 <resources>
     <string name="app_name">Family recipes</string>
+
+    //Buttons text
+    <string name="add">Add</string>
+    <string name="profile">Profile</string>
+    <string name="categories">Categories</string>
+    <string name="add_a_category">Add a category</string>
+    <string name="add_a_recipe">Add a recipe</string>
+    <string name="add_an_ingredient">Add an ingredient</string>
+    <string name="add_a_step">Add a step</string>
+    <string name="select">Select</string>
+    <string name="cancel">Cancel</string>
+
+    //Field text
+    <string name="empty_string" />
+    <string name="search_a_recipe...">Search a recipe…</string>
+    <string name="type_a_name">Type a name…</string>
+    <string name="select...">Select…</string>
+    <string name="step">Step</string>
+    <string name="category_name">Category name</string>
+
+    //Label text
+    <string name="all_recipes">All recipes</string>
+    <string name="adding_a_recipe">Adding a recipe</string>
+    <string name="add_an_image">Add an image</string>
+    <string name="name">Name</string>
+    <string name="serving">Serving(s)</string>
+    <string name="preparation_time">Preparation time</string>
+    <string name="category">Category</string>
+    <string name="ingredients">Ingredients</string>
+    <string name="method">Method</string>
+    <string name="select_a_category">Select a category</string>
+    <string name="recipe_options">Recipe options</string>
+    <string name="edit">Edit</string>
+    <string name="add_to_category">Add to category</string>
+    <string name="share">Share</string>
+    <string name="delete">Delete</string>
+
+    <string name="price">%s$</string>
+
+    //Other
+    <string name="category_separator">  •  </string>
 </resources>
