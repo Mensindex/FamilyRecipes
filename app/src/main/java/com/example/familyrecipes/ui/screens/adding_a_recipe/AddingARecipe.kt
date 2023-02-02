@@ -13,10 +13,7 @@ import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,13 +26,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.example.familyrecipes.R
-import com.example.familyrecipes.data.models.Category
 import com.example.familyrecipes.data.models.Ingredient
 import com.example.familyrecipes.data.models.MethodStep
-import com.example.familyrecipes.ui.screens.adding_a_recipe.components.SelectACategoryBottomSheet
+import com.example.familyrecipes.ui.screens.adding_a_recipe.components.BaseBottomSheet
+import com.example.familyrecipes.ui.screens.adding_a_recipe.components.BottomSheetType
+import com.example.familyrecipes.ui.screens.adding_a_recipe.components.RecipeImage
 import com.example.familyrecipes.ui.screens.common.*
 import com.example.familyrecipes.ui.theme.Typography
 import kotlinx.coroutines.launch
+import java.time.LocalTime
 
 @Preview(showBackground = true)
 @Composable
@@ -51,44 +50,56 @@ fun AddingARecipePreview() {
 fun AddingARecipe(
     onBackClick: () -> Unit,
     onCompleteClick: () -> Unit,
+    viewModel: AddingARecipeViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
 ) {
-    val ingredientsList = remember { mutableStateListOf<Ingredient>() }
+    val uiState by viewModel.addingARecipeUIState.collectAsState()
+
+    //Categories/Ingredients&Methods
+    val categoryList = remember { uiState.categories }
+    val ingredientsList = remember { uiState.ingredients }
     val methodList = remember { mutableStateListOf<MethodStep>() }
     val focusManager = LocalFocusManager.current
+    //Preparation time
+    val timeValue = remember { mutableStateOf(LocalTime.MIDNIGHT) }
     //TopBar animation
     val scrollBehavior = TopAppBarDefaults
         .exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
-    val collapsed = dimensionResource(id = R.dimen.collapsedTopAppBarTitleSize).value.toInt()
-    val expanded = dimensionResource(id = R.dimen.expandedTopAppBarTitleSize).value.toInt()
+    val sizeOfCollapsedTopBar =
+        dimensionResource(id = R.dimen.collapsedTopAppBarTitleSize).value.toInt()
+    val sizeOfExpandedTopBar =
+        dimensionResource(id = R.dimen.expandedTopAppBarTitleSize).value.toInt()
     val topAppBarTextSize =
-        (collapsed + (expanded - collapsed) * (1 - scrollBehavior.state.collapsedFraction)).sp
+        (sizeOfCollapsedTopBar + (sizeOfExpandedTopBar - sizeOfCollapsedTopBar) * (1 - scrollBehavior.state.collapsedFraction)).sp
     //BottomSheet setting
-    val sheetState = rememberModalBottomSheetState(
+    val modalBottomSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
         confirmStateChange = { it != ModalBottomSheetValue.HalfExpanded }
     )
-    val coroutineScope = rememberCoroutineScope()
-    BackHandler(
-        enabled = sheetState.isVisible,
-        onBack = { coroutineScope.launch { sheetState.hide() } }
-    )
-    val categoryList = remember {
-        mutableStateListOf<Category>(
-            Category(name = "Breakfast"),
-            Category(name = "Lunch"),
-            Category(name = "Dinner"),
-        )
+    var currentBottomSheet: BottomSheetType? by remember {
+        mutableStateOf(null)
     }
+    val coroutineScope = rememberCoroutineScope()
+    //BackHandler
+    BackHandler(
+        enabled = modalBottomSheetState.isVisible,
+        onBack = { coroutineScope.launch { modalBottomSheetState.hide() } }
+    )
 
     ModalBottomSheetLayout(
-        sheetState = sheetState,
-        sheetContent = {
-            SelectACategoryBottomSheet(
-                onSelectClick = { coroutineScope.launch { sheetState.hide() } },
-                categoryList = categoryList
-            )
-        },
         modifier = Modifier.fillMaxSize(),
+        sheetState = modalBottomSheetState,
+        sheetContent = {
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.dp1)))
+            currentBottomSheet?.let {
+                BaseBottomSheet(
+                    bottomSheetType = it,
+                    categoryList = uiState.categories,
+                    timeValue = timeValue,
+                    onSelectCategoryClick = { coroutineScope.launch { modalBottomSheetState.hide() } },
+                    onSelectTimeClick = { coroutineScope.launch { modalBottomSheetState.hide() } }
+                )
+            }
+        },
         sheetShape = RoundedCornerShape(
             topStart = dimensionResource(id = R.dimen.dp14),
             topEnd = dimensionResource(id = R.dimen.dp14)
@@ -115,7 +126,7 @@ fun AddingARecipe(
                         },
                         actions = {
                             Image(
-                                modifier = Modifier.clickable { onCompleteClick },
+                                modifier = Modifier.clickable { onCompleteClick() },
                                 painter = painterResource(id = R.drawable.done),
                                 contentDescription = null,
                                 contentScale = ContentScale.Fit,
@@ -123,7 +134,7 @@ fun AddingARecipe(
                         },
                         navigationIcon = {
                             Image(
-                                modifier = Modifier.clickable { onBackClick },
+                                modifier = Modifier.clickable { onBackClick() },
                                 painter = painterResource(
                                     id = R.drawable.chevron_left
                                 ),
@@ -152,7 +163,10 @@ fun AddingARecipe(
                         Column(
                             modifier = Modifier.fillMaxWidth(),
                         ) {
-                            Placeholder {}
+                            RecipeImage(
+                                addImageUriCallBack = { viewModel.addRecipeImage(it) },
+                                image = uiState.recipeImage
+                            )
                             Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.dp24)))
                             Column(
                                 modifier = Modifier,
@@ -164,8 +178,10 @@ fun AddingARecipe(
                                     style = Typography.labelLarge
                                 )
                                 CustomInputField(
-                                    text = "",
-                                    onValueChange = {},
+                                    text = uiState.recipeName,
+                                    onValueChange = {
+                                        viewModel.setRecipeName(it)
+                                    },
                                     hintText = stringResource(id = R.string.type_a_name),
                                 )
                             }
@@ -185,9 +201,7 @@ fun AddingARecipe(
                                         text = stringResource(id = R.string.serving),
                                         style = Typography.labelLarge
                                     )
-                                    CustomInputField(
-                                        onValueChange = {},
-                                    )
+                                    ServingInputField()
                                 }
                                 Column(
                                     modifier = Modifier.weight(0.5f),
@@ -198,8 +212,15 @@ fun AddingARecipe(
                                         text = stringResource(id = R.string.preparation_time),
                                         style = Typography.labelLarge
                                     )
-                                    CustomInputField(
-                                        onValueChange = {},
+                                    CustomSelectTextField(
+                                        text =
+                                        if (timeValue.value != LocalTime.MIDNIGHT) {
+                                            "${timeValue.value.hour}h ${timeValue.value.minute}m"
+                                        } else stringResource(id = R.string.empty_string),
+                                        onClick = {
+                                            currentBottomSheet = BottomSheetType.TYPE1
+                                            coroutineScope.launch { modalBottomSheetState.show() }
+                                        },
                                     )
                                 }
                             }
@@ -221,8 +242,9 @@ fun AddingARecipe(
                                         ) { it.name },
                                     modifier = Modifier,
                                     onClick = {
+                                        currentBottomSheet = BottomSheetType.TYPE2
                                         coroutineScope.launch {
-                                            sheetState.show()
+                                            modalBottomSheetState.show()
                                         }
                                     },
                                 )
@@ -315,14 +337,10 @@ fun AddingARecipe(
                         ) {
                             methodList.add(MethodStep())
                         }
-                    }
-
-                    item {
                         Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.dp32)))
                     }
                 }
             }
         }
     )
-
 }

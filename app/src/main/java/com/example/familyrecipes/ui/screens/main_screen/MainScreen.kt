@@ -56,14 +56,14 @@ fun MainScreen() {
                 }
             )
         }
-    ) {
+    ) { innerPadding ->
         LazyColumn(
             modifier = Modifier
                 .padding(
                     start = dimensionResource(id = R.dimen.dp16),
                     end = dimensionResource(id = R.dimen.dp16),
-                    top = it.calculateTopPadding(),
-                    bottom = it.calculateBottomPadding(),
+                    top = innerPadding.calculateTopPadding(),
+                    bottom = innerPadding.calculateBottomPadding(),
                 )
                 .fillMaxWidth(),
             content = {
@@ -85,14 +85,14 @@ fun MainScreen() {
                                     tint = Verdigris,
                                     modifier = Modifier
                                 )
-                            }
-                        ,
+                            },
                             text = "",
                             onValueChange = {}
                         )
                     }
-                    Spacer(modifier = Modifier
-                        .height(dimensionResource(id = R.dimen.dp24))
+                    Spacer(
+                        modifier = Modifier
+                            .height(dimensionResource(id = R.dimen.dp24))
                     )
                 }
 
@@ -112,15 +112,19 @@ fun MainScreen() {
                         )
                         SmallCategoriesButton()
                     }
-                    Spacer(modifier = Modifier
-                        .height(dimensionResource(id = R.dimen.dp16)))
+                    Spacer(
+                        modifier = Modifier
+                            .height(dimensionResource(id = R.dimen.dp16))
+                    )
                 }
                 items(
                     items = myRecipeList,
                     itemContent = { item ->
                         RecipeCard(item)
-                        Spacer(modifier = Modifier
-                            .height(dimensionResource(id = R.dimen.dp12)))
+                        Spacer(
+                            modifier = Modifier
+                                .height(dimensionResource(id = R.dimen.dp12))
+                        )
                     })
             }
         )

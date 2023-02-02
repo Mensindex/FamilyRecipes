@@ -200,22 +200,24 @@ fun TestPreview() {
 
 @Composable
 fun StrokeButton(
+    width: Float = 1f,
+    color: Color = Verdigris,
     label:String,
     enable: Boolean = false,
     onClick: () -> Unit,
 ) {
     val animatedColor = animateColorAsState(
-        targetValue = if (enable) Verdigris else Heather,
+        targetValue = if (enable) color else Heather,
     )
     Box(
         modifier = Modifier
             .clip(Shapes.small)
             .height(dimensionResource(id = R.dimen.large_btn_height))
-            .fillMaxWidth()
+            .fillMaxWidth(fraction = width)
             .clickable(
                 enabled = enable,
                 interactionSource = remember { MutableInteractionSource() },
-                indication = rememberRipple(color = Verdigris),
+                indication = rememberRipple(color = color),
                 onClick = onClick,
             ),
         contentAlignment = Center,

@@ -31,9 +31,14 @@
     <string name="ingredients">Ingredients</string>
     <string name="method">Method</string>
     <string name="select_a_category">Select a category</string>
+    <string name="recipe_options">Recipe options</string>
+    <string name="edit">Edit</string>
+    <string name="add_to_category">Add to category</string>
+    <string name="share">Share</string>
+    <string name="delete">Delete</string>
 
     <string name="price">%s$</string>
 
     //Other
-    <string name="category_separator"> • </string>
+    <string name="category_separator">  •  </string>
 </resources>

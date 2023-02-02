@@ -49,7 +49,7 @@ fun SelectACategoryPreview() {
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun SelectACategoryBottomSheet(
-    onSelectClick: () -> Unit,
+    onSelectClick: (() -> Unit)?,
     categoryList: MutableList<Category>,
 ) {
 
@@ -189,7 +189,7 @@ fun SelectACategoryBottomSheet(
             StrokeButton(
                 enable = categoryList.any { it.isChecked.value },
                 label = stringResource(id = R.string.select),
-                onClick = { onSelectClick() }
+                onClick = { onSelectClick?.invoke() }
             )
         }
 

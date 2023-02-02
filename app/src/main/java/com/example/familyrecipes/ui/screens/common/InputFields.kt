@@ -6,6 +6,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Icon
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
@@ -24,6 +25,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,7 +36,9 @@ import com.example.familyrecipes.ui.theme.*
 @Preview(showBackground = true)
 @Composable
 fun TesttPreview() {
+    CustomSelectTextField() {
 
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -209,5 +213,61 @@ fun CreateACategoryField(
             )
         }
 
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ServingInputField(
+) {
+    var servingText by remember { mutableStateOf("") }
+    val focusManager = LocalFocusManager.current
+    Row(
+        modifier = Modifier
+            .height(dimensionResource(id = R.dimen.large_btn_height))
+            .clip(shape = Shapes.small)
+            .background(color = Alabaster)
+            .padding(horizontal = dimensionResource(id = R.dimen.dp16)),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.dp16)),
+    ) {
+        BasicTextField(
+            modifier = Modifier
+                .weight(1f)
+                .focusRequester(remember { FocusRequester() }),
+            value = servingText,
+            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            onValueChange = { servingText = it },
+            textStyle = Typography.bodyMedium,
+            singleLine = true,
+            cursorBrush = SolidColor(Verdigris),
+            decorationBox = { innerTextField ->
+                TextFieldDefaults.TextFieldDecorationBox(
+                    colors = TextFieldDefaults.textFieldColors(
+                        textColor = Color.Black,
+                        containerColor = Color.Transparent,
+                        cursorColor = Verdigris,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                    ),
+                    value = servingText,
+                    innerTextField = innerTextField,
+                    enabled = true,
+                    singleLine = true,
+                    visualTransformation = VisualTransformation.None,
+                    interactionSource = remember {
+                        MutableInteractionSource()
+                    },
+                    contentPadding = PaddingValues(0.dp),
+                    placeholder = {
+                        Text(
+                            text = stringResource(id = R.string.select___),
+                            style = Typography.bodyMedium,
+                            color = Heather,
+                        )
+                    }
+                )
+            })
     }
 }
