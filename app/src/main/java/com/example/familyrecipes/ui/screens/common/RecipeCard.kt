@@ -1,6 +1,9 @@
 package com.example.familyrecipes.ui.screens.common
 
+import android.graphics.Bitmap
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -11,28 +14,32 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.familyrecipes.R
 import com.example.familyrecipes.ui.theme.Heather
 import com.example.familyrecipes.ui.theme.Shapes
+import com.example.familyrecipes.ui.theme.SoftPeach
 import com.example.familyrecipes.ui.theme.Typography
-
-@Preview(showBackground = true)
-@Composable
-fun RecipeCardPreview() {
-    RecipeCard("Granny's cake")
-}
+import java.time.LocalTime
 
 
 @Composable
-fun RecipeCard(recipeName: String) {
+fun RecipeCard(
+    recipeName: String,
+    preparingTime: LocalTime,
+    recipeImage: Bitmap?,
+    onClick: () -> Unit,
+) {
     Card(
         modifier = Modifier
+            .clickable(
+                onClick = onClick,
+            )
             .height(dimensionResource(id = R.dimen.recipe_card_height))
             .fillMaxWidth()
             .graphicsLayer { }
@@ -83,22 +90,36 @@ fun RecipeCard(recipeName: String) {
                     Text(
                         modifier = Modifier
                             .padding(bottom = dimensionResource(id = R.dimen.dp2)),
-                        text = "1h 40m",
+                        text = "${preparingTime.hour}h ${preparingTime.minute}m",
                         style = Typography.labelMedium,
                         color = Heather,
                     )
                 }
             }
 
-            Image(
-                modifier = Modifier
-                    .clip(Shapes.small)
-                    .fillMaxHeight()
-                    .width(72.dp),
-                painter = painterResource(id = R.drawable.placeholder),
-                contentDescription = null,
-                contentScale = ContentScale.Fit
-            )
+            if (recipeImage != null) {
+                Image(
+                    modifier = Modifier
+                        .clip(Shapes.small)
+                        .fillMaxHeight()
+                        .width(72.dp)
+                        .background(SoftPeach),
+                    bitmap = recipeImage.asImageBitmap(),
+                    contentDescription = null,
+                    contentScale = ContentScale.Fit
+                )
+            } else {
+                Image(
+                    modifier = Modifier
+                        .clip(Shapes.small)
+                        .fillMaxHeight()
+                        .width(72.dp)
+                        .background(SoftPeach),
+                    painter = painterResource(id = R.drawable.mini_placeholder),
+                    contentDescription = null,
+                    contentScale = ContentScale.Fit
+                )
+            }
         }
     }
 }

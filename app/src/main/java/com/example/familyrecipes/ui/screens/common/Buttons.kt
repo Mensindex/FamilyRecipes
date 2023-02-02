@@ -29,9 +29,11 @@ import com.example.familyrecipes.R
 import com.example.familyrecipes.ui.theme.*
 
 @Composable
-fun LargeAddButton() {
+fun LargeAddButton(
+    onClick: () -> Unit,
+) {
     Button(
-        onClick = {},
+        onClick = onClick,
         modifier = Modifier
             .height(dimensionResource(id = R.dimen.large_btn_height)),
         contentPadding = PaddingValues(horizontal = dimensionResource(id = R.dimen.dp16)),
@@ -60,9 +62,11 @@ fun LargeAddButton() {
 }
 
 @Composable
-fun SmallCategoriesButton() {
+fun SmallCategoriesButton(
+    onClick: () -> Unit,
+) {
     OutlinedButton(
-        onClick = {},
+        onClick = onClick,
         modifier = Modifier
             .height(dimensionResource(id = R.dimen.small_btn_height)),
         border = BorderStroke(

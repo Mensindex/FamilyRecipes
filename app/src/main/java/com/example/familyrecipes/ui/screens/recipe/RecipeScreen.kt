@@ -32,6 +32,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.familyrecipes.R
 import com.example.familyrecipes.data.models.Recipe
 import com.example.familyrecipes.ui.screens.recipe.components.RecipeOptionsBottomSheet
@@ -41,6 +42,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun RecipeScreen(
+    navController: NavHostController,
     recipe: Recipe,
     onBackClick: () -> Unit,
 ) {
@@ -165,7 +167,6 @@ fun RecipeScreen(
                                         contentDescription = null,
                                         modifier = Modifier
                                             .fillMaxSize()
-                                            .padding(dimensionResource(id = R.dimen.dp16))
                                     )
 
                                 } else {

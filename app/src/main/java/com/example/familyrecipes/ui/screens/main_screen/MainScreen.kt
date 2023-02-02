@@ -12,8 +12,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavHostController
 import com.example.familyrecipes.R
+import com.example.familyrecipes.data.models.Recipe
+import com.example.familyrecipes.ui.navigation.NavRoute
 import com.example.familyrecipes.ui.screens.common.CustomInputField
 import com.example.familyrecipes.ui.screens.common.LargeAddButton
 import com.example.familyrecipes.ui.screens.common.RecipeCard
@@ -22,24 +24,12 @@ import com.example.familyrecipes.ui.theme.Heather
 import com.example.familyrecipes.ui.theme.Typography
 import com.example.familyrecipes.ui.theme.Verdigris
 
-@Preview(showBackground = true)
-@Composable
-fun MainScreenTest() {
-    MainScreen()
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen() {
-    val myRecipeList = mutableListOf<String>(
-        "Granny’s cake",
-        "Smoky braised brisket",
-        "Sticky bourbon BBQ wings with blue cheese dip",
-        "Corndogs",
-        "Pecan pie with maple cream",
-        "Beef soup",
-        "American pancakes",
-    )
+fun MainScreen(
+    navController: NavHostController,
+    recipeList: MutableList<Recipe>
+) {
     Scaffold(
         containerColor = Color.White,
         topBar = {
@@ -74,7 +64,9 @@ fun MainScreen() {
                         horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.dp8))
                     )
                     {
-                        LargeAddButton()
+                        LargeAddButton {
+                            navController.navigate(route = NavRoute.AddingARecipeRoute.route)
+                        }
                         CustomInputField(
                             modifier = Modifier.weight(0.7f),
                             hintText = stringResource(id = R.string.search_a_recipe___),
@@ -86,7 +78,7 @@ fun MainScreen() {
                                     modifier = Modifier
                                 )
                             },
-                            text = "",
+                            text = stringResource(id = R.string.empty_string),
                             onValueChange = {}
                         )
                     }
@@ -110,7 +102,9 @@ fun MainScreen() {
                             style = Typography.labelLarge,
                             color = Heather,
                         )
-                        SmallCategoriesButton()
+                        SmallCategoriesButton {
+                            navController.navigate(route = NavRoute.CategoryListRoute.route)
+                        }
                     }
                     Spacer(
                         modifier = Modifier
@@ -118,14 +112,23 @@ fun MainScreen() {
                     )
                 }
                 items(
-                    items = myRecipeList,
+                    items = recipeList,
                     itemContent = { item ->
-                        RecipeCard(item)
+                        RecipeCard(
+                            onClick = {navController.navigate(route = NavRoute.RecipeRoute.route)},
+                            recipeName = item.name,
+                            preparingTime = item.preparingTime,
+                            recipeImage = item.image,
+                        )
                         Spacer(
                             modifier = Modifier
                                 .height(dimensionResource(id = R.dimen.dp12))
                         )
                     })
+                item {
+                    Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.dp16)))
+                }
+
             }
         )
     }

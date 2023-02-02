@@ -70,7 +70,6 @@ fun RecipeImage(
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(dimensionResource(id = R.dimen.dp16))
             )
             Column(
                 modifier = Modifier

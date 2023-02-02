@@ -1,5 +1,6 @@
 package com.example.familyrecipes.ui.screens.common
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -13,22 +14,21 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import com.example.familyrecipes.R
 import com.example.familyrecipes.ui.theme.Heather
 import com.example.familyrecipes.ui.theme.Shapes
 import com.example.familyrecipes.ui.theme.Typography
 
-@Preview(showBackground = true)
 @Composable
-fun CategoryCardPreview() {
-    CategoryCard("Breakfast")
-}
-
-@Composable
-fun CategoryCard(categoryName: String) {
+fun CategoryCard(
+    categoryName: String,
+    onClick: ()->Unit,
+) {
     Card(
         modifier = Modifier
+            .clickable(
+                onClick = onClick
+            )
             .height(dimensionResource(id = R.dimen.recipe_card_height))
             .fillMaxWidth()
             .graphicsLayer { }

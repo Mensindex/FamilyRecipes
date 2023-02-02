@@ -23,24 +23,21 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.familyrecipes.R
+import com.example.familyrecipes.ui.navigation.NavRoute
 import com.example.familyrecipes.ui.screens.category_list.components.AddACategoryBottomSheet
 import com.example.familyrecipes.ui.screens.common.CategoryCard
 import com.example.familyrecipes.ui.theme.Typography
 import com.example.familyrecipes.ui.theme.Verdigris
 import kotlinx.coroutines.launch
 
-@Preview(showBackground = true)
-@Composable
-fun CategoryListTest() {
-    CategoryList()
-}
-
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
-fun CategoryList() {
+fun CategoryListScreen(
+    navController: NavHostController,
+) {
     val myCategoryList = mutableListOf("Breakfast", "Lunch", "Dinner")
     //Animation
     var isClicked by remember { mutableStateOf(false) }
@@ -101,6 +98,7 @@ fun CategoryList() {
                             Text(
                                 text = stringResource(id = R.string.categories),
                                 style = Typography.headlineLarge,
+                                fontSize = topAppBarTextSize,
                             )
                         },
                         actions = {
@@ -161,7 +159,10 @@ fun CategoryList() {
                         items(
                             items = myCategoryList,
                             itemContent = { item ->
-                                CategoryCard(item)
+                                CategoryCard(
+                                    categoryName = item,
+                                    onClick = { navController.navigate(route = NavRoute.RecipeRoute.route) }
+                                )
                                 Spacer(
                                     modifier = Modifier
                                         .height(dimensionResource(id = R.dimen.dp12))

@@ -23,8 +23,8 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.familyrecipes.R
 import com.example.familyrecipes.data.models.Ingredient
 import com.example.familyrecipes.data.models.MethodStep
@@ -36,18 +36,10 @@ import com.example.familyrecipes.ui.theme.Typography
 import kotlinx.coroutines.launch
 import java.time.LocalTime
 
-@Preview(showBackground = true)
-@Composable
-fun AddingARecipePreview() {
-    AddingARecipe(
-        onBackClick = {},
-        onCompleteClick = {},
-    )
-}
-
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun AddingARecipe(
+    navController: NavHostController,
     onBackClick: () -> Unit,
     onCompleteClick: () -> Unit,
     viewModel: AddingARecipeViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
@@ -126,7 +118,9 @@ fun AddingARecipe(
                         },
                         actions = {
                             Image(
-                                modifier = Modifier.clickable { onCompleteClick() },
+                                modifier = Modifier.clickable {
+                                    onCompleteClick()
+                                },
                                 painter = painterResource(id = R.drawable.done),
                                 contentDescription = null,
                                 contentScale = ContentScale.Fit,

@@ -11,8 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 class AddingARecipeViewModel : ViewModel() {
-    private val _addingARecipeUIState =
-        MutableStateFlow(AddingARecipeUIState())
+    private val _addingARecipeUIState = MutableStateFlow(AddingARecipeUIState())
     val addingARecipeUIState = _addingARecipeUIState.asStateFlow()
 
     fun addCategory(name: String) {
@@ -40,6 +39,7 @@ class AddingARecipeViewModel : ViewModel() {
             )
         }
     }
+
     fun setRecipeName(name: String) {
         _addingARecipeUIState.update { currentState ->
             currentState.copy(recipeName = name)
