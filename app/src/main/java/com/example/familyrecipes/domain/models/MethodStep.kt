@@ -1,4 +1,4 @@
-package com.example.familyrecipes.data.models
+package com.example.familyrecipes.domain.models
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf

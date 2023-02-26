@@ -26,7 +26,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.familyrecipes.R
-import com.example.familyrecipes.ui.navigation.NavRoute
 import com.example.familyrecipes.ui.screens.category_list.components.AddACategoryBottomSheet
 import com.example.familyrecipes.ui.screens.common.CategoryCard
 import com.example.familyrecipes.ui.theme.Typography
@@ -98,7 +97,6 @@ fun CategoryListScreen(
                             Text(
                                 text = stringResource(id = R.string.categories),
                                 style = Typography.headlineLarge,
-                                fontSize = topAppBarTextSize,
                             )
                         },
                         actions = {
@@ -159,10 +157,7 @@ fun CategoryListScreen(
                         items(
                             items = myCategoryList,
                             itemContent = { item ->
-                                CategoryCard(
-                                    categoryName = item,
-                                    onClick = { navController.navigate(route = NavRoute.RecipeRoute.route) }
-                                )
+                                CategoryCard(item)
                                 Spacer(
                                     modifier = Modifier
                                         .height(dimensionResource(id = R.dimen.dp12))

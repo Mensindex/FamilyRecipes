@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.familyrecipes.R
-import com.example.familyrecipes.data.models.Recipe
+import com.example.familyrecipes.domain.models.Recipe
 import com.example.familyrecipes.ui.screens.recipe.components.RecipeOptionsBottomSheet
 import com.example.familyrecipes.ui.theme.*
 import kotlinx.coroutines.launch

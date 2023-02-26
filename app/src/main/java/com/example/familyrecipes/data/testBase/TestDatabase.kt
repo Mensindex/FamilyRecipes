@@ -1,9 +1,10 @@
 package com.example.familyrecipes.data.testBase
 
 import androidx.compose.runtime.mutableStateOf
-import com.example.familyrecipes.data.models.Ingredient
-import com.example.familyrecipes.data.models.MethodStep
-import com.example.familyrecipes.data.models.Recipe
+import com.example.familyrecipes.data.entities.CategoryEntity
+import com.example.familyrecipes.domain.models.Ingredient
+import com.example.familyrecipes.domain.models.MethodStep
+import com.example.familyrecipes.domain.models.Recipe
 import java.time.LocalTime
 
 object TestDatabase {
@@ -64,119 +65,76 @@ object TestDatabase {
 
         )
 
-    val myRecipeList = mutableListOf<Recipe>(
+    val myRecipeList = mutableListOf(
         Recipe(
-            "Granny's cake",
-            null,
-            LocalTime.of(1, 20),
-            3,
-            ingredientList,
-            stepList,
+            id = -1,
+            name = "Granny's cake",
+            image = null,
+            preparingTime = LocalTime.of(1, 20),
+            servings = 3,
+            ingredients = ingredientList,
+            method = stepList,
+            categories = listOf(CategoryEntity(id = 0, name = "Breakfast"))
         ),
         Recipe(
-            "Smoky braised brisket",
-            null,
-            LocalTime.of(0, 45),
-            2,
-            ingredientList,
-            stepList,
+            id = -1,
+            name = "Smoky braised brisket",
+            image = null,
+            preparingTime = LocalTime.of(0, 45),
+            servings = 2,
+            ingredients = ingredientList,
+            method = stepList,
+            categories = listOf(CategoryEntity(id = 0, name = "Breakfast"))
         ),
         Recipe(
-            "Sticky bourbon BBQ wings with blue cheese dip",
-            null,
-            LocalTime.of(2, 8),
-            2,
-            ingredientList,
-            stepList,
+            id = -1,
+            name = "Sticky bourbon BBQ wings with blue cheese dip",
+            image = null,
+            preparingTime = LocalTime.of(2, 8),
+            servings = 2,
+            ingredients = ingredientList,
+            method = stepList,
+            categories = listOf(CategoryEntity(id = 0, name = "Breakfast"))
         ),
         Recipe(
-            "Corndogs",
-            null,
-            LocalTime.of(0, 20),
-            4,
-            ingredientList,
-            stepList,
+            id = 0,
+            name = "Corndogs",
+            image = null,
+            preparingTime = LocalTime.of(0, 20),
+            servings = 4,
+            ingredients = ingredientList,
+            method = stepList,
+            categories = listOf(CategoryEntity(id = 0, name = "Breakfast"))
         ),
         Recipe(
-            "Pecan pie with maple cream",
-            null,
-            LocalTime.of(1, 10),
-            1,
-            ingredientList,
-            stepList,
+            id = 1,
+            name = "Pecan pie with maple cream",
+            image = null,
+            preparingTime = LocalTime.of(1, 10),
+            servings = 1,
+            ingredients = ingredientList,
+            method = stepList,
+            categories = listOf(CategoryEntity(id = 0, name = "Breakfast"))
         ),
         Recipe(
-            "Beaf soup",
-            null,
-            LocalTime.of(1, 15),
-            2,
-            ingredientList,
-            stepList,
+            id = 2,
+            name = "Beaf soup",
+            image = null,
+            preparingTime = LocalTime.of(1, 15),
+            servings = 2,
+            ingredients = ingredientList,
+            method = stepList,
+            categories = listOf(CategoryEntity(id = 0, name = "Breakfast"))
         ),
         Recipe(
-            "American pancakes",
-            null,
-            LocalTime.of(0, 50),
-            3,
-            ingredientList,
-            stepList,
-        ),
-
-        Recipe(
-            "Granny's cake",
-            null,
-            LocalTime.of(1, 20),
-            3,
-            ingredientList,
-            stepList,
-        ),
-        Recipe(
-            "Smoky braised brisket",
-            null,
-            LocalTime.of(0, 45),
-            2,
-            ingredientList,
-            stepList,
-        ),
-        Recipe(
-            "Sticky bourbon BBQ wings with blue cheese dip",
-            null,
-            LocalTime.of(2, 8),
-            2,
-            ingredientList,
-            stepList,
-        ),
-        Recipe(
-            "Corndogs",
-            null,
-            LocalTime.of(0, 20),
-            4,
-            ingredientList,
-            stepList,
-        ),
-        Recipe(
-            "Pecan pie with maple cream",
-            null,
-            LocalTime.of(1, 10),
-            1,
-            ingredientList,
-            stepList,
-        ),
-        Recipe(
-            "Beaf soup",
-            null,
-            LocalTime.of(1, 15),
-            2,
-            ingredientList,
-            stepList,
-        ),
-        Recipe(
-            "American pancakes",
-            null,
-            LocalTime.of(0, 50),
-            3,
-            ingredientList,
-            stepList,
+            id = 3,
+            name = "American pancakes",
+            image = null,
+            preparingTime = LocalTime.of(0, 50),
+            servings = 3,
+            ingredients = ingredientList,
+            method =stepList,
+            categories = listOf(CategoryEntity(id = 0, name = "Breakfast"))
         ),
     )
 }

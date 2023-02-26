@@ -6,15 +6,18 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.familyrecipes.App
 import com.example.familyrecipes.R
-import com.example.familyrecipes.data.models.Recipe
 import com.example.familyrecipes.ui.navigation.NavRoute
 import com.example.familyrecipes.ui.screens.common.CustomInputField
 import com.example.familyrecipes.ui.screens.common.LargeAddButton
@@ -28,8 +31,11 @@ import com.example.familyrecipes.ui.theme.Verdigris
 @Composable
 fun MainScreen(
     navController: NavHostController,
-    recipeList: MutableList<Recipe>
+    viewModel: MainViewModel =
+        viewModel(factory = MainViewModelFactory(App.dao)),
 ) {
+    val uiState by viewModel.mainViewModelUIState.collectAsState()
+
     Scaffold(
         containerColor = Color.White,
         topBar = {
@@ -78,7 +84,7 @@ fun MainScreen(
                                     modifier = Modifier
                                 )
                             },
-                            text = stringResource(id = R.string.empty_string),
+                            text = "",
                             onValueChange = {}
                         )
                     }
@@ -102,9 +108,7 @@ fun MainScreen(
                             style = Typography.labelLarge,
                             color = Heather,
                         )
-                        SmallCategoriesButton {
-                            navController.navigate(route = NavRoute.CategoryListRoute.route)
-                        }
+                        SmallCategoriesButton()
                     }
                     Spacer(
                         modifier = Modifier
@@ -112,13 +116,11 @@ fun MainScreen(
                     )
                 }
                 items(
-                    items = recipeList,
+                    items = uiState.listRecipe,
                     itemContent = { item ->
                         RecipeCard(
-                            onClick = {navController.navigate(route = NavRoute.RecipeRoute.route)},
-                            recipeName = item.name,
-                            preparingTime = item.preparingTime,
-                            recipeImage = item.image,
+                            onClick = { navController.navigate(route = NavRoute.RecipeRoute.route) },
+                            recipe = item
                         )
                         Spacer(
                             modifier = Modifier

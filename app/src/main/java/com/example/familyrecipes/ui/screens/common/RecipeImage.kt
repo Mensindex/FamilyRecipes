@@ -24,7 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.familyrecipes.R
-import com.example.familyrecipes.data.models.RecipeImage
+import com.example.familyrecipes.domain.models.RecipeImage
 import com.example.familyrecipes.ui.theme.Heather
 import com.example.familyrecipes.ui.theme.Shapes
 import com.example.familyrecipes.ui.theme.SoftPeach

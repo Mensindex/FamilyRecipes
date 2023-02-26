@@ -5,7 +5,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LargeTopAppBar
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -14,10 +17,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.familyrecipes.R
-import com.example.familyrecipes.data.models.Recipe
+import com.example.familyrecipes.domain.models.Recipe
 import com.example.familyrecipes.ui.navigation.NavRoute
 import com.example.familyrecipes.ui.screens.common.RecipeCard
 import com.example.familyrecipes.ui.theme.Typography
@@ -29,18 +31,22 @@ fun RecipeList(
     navController: NavHostController,
     recipeList: MutableList<Recipe>
 ) {
-
-    //TopBar animation
-    val scrollBehavior = TopAppBarDefaults
-        .exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
-    val sizeOfCollapsedTopBar =
-        dimensionResource(id = R.dimen.collapsedTopAppBarTitleSize).value.toInt()
-    val sizeOfExpandedTopBar =
-        dimensionResource(id = R.dimen.expandedTopAppBarTitleSize).value.toInt()
-    val topAppBarTextSize =
-        (sizeOfCollapsedTopBar + (sizeOfExpandedTopBar - sizeOfCollapsedTopBar)
-                * (1 - scrollBehavior.state.collapsedFraction)).sp
-
+    val myRecipeList = mutableListOf<String>(
+        "Granny’s cake",
+        "Smoky braised brisket",
+        "Sticky bourbon BBQ wings with blue cheese dip",
+        "Corndogs",
+        "Pecan pie with maple cream",
+        "Beaf soup",
+        "American pancakes",
+        "Granny’s cake",
+        "Smoky braised brisket",
+        "Sticky bourbon BBQ wings with blue cheese dip",
+        "Corndogs",
+        "Pecan pie with maple cream",
+        "Beaf soup",
+        "American pancakes",
+    )
     Scaffold(
         modifier = Modifier,
         containerColor = Color.White,
@@ -51,7 +57,6 @@ fun RecipeList(
                     Text(
                         text = "Breakfast",
                         style = Typography.headlineLarge,
-                        fontSize = topAppBarTextSize,
                     )
                 },
                 actions = {
@@ -101,9 +106,7 @@ fun RecipeList(
                     itemContent = { item ->
                         RecipeCard(
                             onClick = {navController.navigate(route = NavRoute.RecipeRoute.route)},
-                            recipeName = item.name,
-                            preparingTime = item.preparingTime,
-                            recipeImage = item.image,
+                            recipe = item
                         )
                         Spacer(modifier = Modifier
                             .height(dimensionResource(id = R.dimen.dp12)))

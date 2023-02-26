@@ -218,8 +218,7 @@ fun CreateACategoryField(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ServingInputField(
-) {
+fun ServingInputField(onSuccess: (String) -> Unit) {
     var servingText by remember { mutableStateOf("") }
     val focusManager = LocalFocusManager.current
     Row(
@@ -238,7 +237,10 @@ fun ServingInputField(
             value = servingText,
             keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            onValueChange = { servingText = it },
+            onValueChange = {
+                servingText = it
+                onSuccess(it)
+            },
             textStyle = Typography.bodyMedium,
             singleLine = true,
             cursorBrush = SolidColor(Verdigris),

@@ -62,11 +62,9 @@ fun LargeAddButton(
 }
 
 @Composable
-fun SmallCategoriesButton(
-    onClick: () -> Unit,
-) {
+fun SmallCategoriesButton() {
     OutlinedButton(
-        onClick = onClick,
+        onClick = {},
         modifier = Modifier
             .height(dimensionResource(id = R.dimen.small_btn_height)),
         border = BorderStroke(

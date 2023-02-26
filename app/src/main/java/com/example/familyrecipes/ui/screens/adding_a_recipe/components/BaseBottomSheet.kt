@@ -4,16 +4,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import com.example.familyrecipes.data.models.Category
+import com.example.familyrecipes.domain.models.Category
 import java.time.LocalTime
 
 @Composable
 fun BaseBottomSheet(
     bottomSheetType: BottomSheetType,
     onSelectCategoryClick: (() -> Unit)?,
-    categoryList: MutableList<Category> = mutableListOf(),
+    categoryList: List<Category> = emptyList(),
     timeValue: MutableState<LocalTime> = remember {mutableStateOf(LocalTime.MIDNIGHT)},
     onSelectTimeClick: (() -> Unit)?,
+    onAddCategory: (String) -> Unit
 ) {
 
     when (bottomSheetType) {
@@ -28,7 +29,8 @@ fun BaseBottomSheet(
         BottomSheetType.TYPE2 ->
             SelectACategoryBottomSheet(
                 onSelectClick = onSelectCategoryClick,
-                categoryList = categoryList
+                categoryList = categoryList,
+                onAddCategory = onAddCategory,
             )
     }
 }

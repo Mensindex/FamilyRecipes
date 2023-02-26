@@ -1,5 +1,6 @@
 package com.example.familyrecipes.ui.screens.adding_a_recipe
 
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -19,15 +20,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.familyrecipes.App
 import com.example.familyrecipes.R
-import com.example.familyrecipes.data.models.Ingredient
-import com.example.familyrecipes.data.models.MethodStep
+import com.example.familyrecipes.data.entities.toCategoryEntity
+import com.example.familyrecipes.domain.models.Recipe
+import com.example.familyrecipes.ui.navigation.NavRoute
 import com.example.familyrecipes.ui.screens.adding_a_recipe.components.BaseBottomSheet
 import com.example.familyrecipes.ui.screens.adding_a_recipe.components.BottomSheetType
 import com.example.familyrecipes.ui.screens.adding_a_recipe.components.RecipeImage
@@ -41,18 +47,13 @@ import java.time.LocalTime
 fun AddingARecipe(
     navController: NavHostController,
     onBackClick: () -> Unit,
-    onCompleteClick: () -> Unit,
-    viewModel: AddingARecipeViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
+    viewModel: AddingARecipeViewModel = viewModel(factory = AddingARecipeViewModelFactory(App.dao)),
 ) {
+    val context = LocalContext.current
     val uiState by viewModel.addingARecipeUIState.collectAsState()
-
-    //Categories/Ingredients&Methods
-    val categoryList = remember { uiState.categories }
-    val ingredientsList = remember { uiState.ingredients }
-    val methodList = remember { mutableStateListOf<MethodStep>() }
     val focusManager = LocalFocusManager.current
     //Preparation time
-    val timeValue = remember { mutableStateOf(LocalTime.MIDNIGHT) }
+//    val timeValue = remember { mutableStateOf(LocalTime.MIDNIGHT) }
     //TopBar animation
     val scrollBehavior = TopAppBarDefaults
         .exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
@@ -82,13 +83,14 @@ fun AddingARecipe(
         sheetState = modalBottomSheetState,
         sheetContent = {
             Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.dp1)))
-            currentBottomSheet?.let {
+            currentBottomSheet?.let { bottomSheetType ->
                 BaseBottomSheet(
-                    bottomSheetType = it,
+                    bottomSheetType = bottomSheetType,
                     categoryList = uiState.categories,
-                    timeValue = timeValue,
+                    timeValue = uiState.timeValue,
                     onSelectCategoryClick = { coroutineScope.launch { modalBottomSheetState.hide() } },
-                    onSelectTimeClick = { coroutineScope.launch { modalBottomSheetState.hide() } }
+                    onSelectTimeClick = { coroutineScope.launch { modalBottomSheetState.hide() } },
+                    onAddCategory = { viewModel.addCategory(it) }
                 )
             }
         },
@@ -118,9 +120,37 @@ fun AddingARecipe(
                         },
                         actions = {
                             Image(
-                                modifier = Modifier.clickable {
-                                    onCompleteClick()
-                                },
+                                modifier = Modifier
+                                    .clickable(
+                                        onClick = {
+                                            if (with(uiState) {
+                                                    recipeName.isNotEmpty() &&
+                                                            categories.isNotEmpty() &&
+                                                            method.isNotEmpty() &&
+                                                            ingredients.isNotEmpty() &&
+                                                            servings != null
+                                                }) {
+                                                viewModel.viewModelScope.launch {
+                                                    viewModel.addRecipe(
+                                                        Recipe(
+                                                            name = uiState.recipeName,
+                                                            image = uiState.recipeImage?.bitmap,
+                                                            preparingTime = uiState.timeValue.value,
+                                                            categories = uiState.categories.map { category -> category.toCategoryEntity() },
+                                                            ingredients = uiState.ingredients,
+                                                            method = uiState.method,
+                                                        )
+                                                    )
+                                                }
+                                                navController.navigate(route = NavRoute.MainRoute.route)
+                                            } else Toast.makeText(
+                                                context,
+                                                "All fields must be filled",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+
+                                        }
+                                    ),
                                 painter = painterResource(id = R.drawable.done),
                                 contentDescription = null,
                                 contentScale = ContentScale.Fit,
@@ -195,7 +225,9 @@ fun AddingARecipe(
                                         text = stringResource(id = R.string.serving),
                                         style = Typography.labelLarge
                                     )
-                                    ServingInputField()
+                                    ServingInputField() {
+                                        viewModel.setServings(it.toInt())
+                                    }
                                 }
                                 Column(
                                     modifier = Modifier.weight(0.5f),
@@ -208,8 +240,8 @@ fun AddingARecipe(
                                     )
                                     CustomSelectTextField(
                                         text =
-                                        if (timeValue.value != LocalTime.MIDNIGHT) {
-                                            "${timeValue.value.hour}h ${timeValue.value.minute}m"
+                                        if (uiState.timeValue.value != LocalTime.MIDNIGHT) {
+                                            "${uiState.timeValue.value.hour}h ${uiState.timeValue.value.minute}m"
                                         } else stringResource(id = R.string.empty_string),
                                         onClick = {
                                             currentBottomSheet = BottomSheetType.TYPE1
@@ -229,7 +261,7 @@ fun AddingARecipe(
                                     style = Typography.labelLarge
                                 )
                                 CustomSelectTextField(
-                                    text = categoryList
+                                    text = uiState.categories
                                         .filter { it.isChecked.value }
                                         .joinToString(
                                             separator = stringResource(id = R.string.category_separator)
@@ -248,7 +280,7 @@ fun AddingARecipe(
                                 text = stringResource(id = R.string.ingredients),
                                 style = Typography.titleMedium
                             )
-                            if (ingredientsList.isNotEmpty()) {
+                            if (uiState.ingredients.isNotEmpty()) {
                                 Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.dp16)))
                             } else {
                                 Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.dp8)))
@@ -257,7 +289,7 @@ fun AddingARecipe(
                     }
 
 
-                    itemsIndexed(ingredientsList) { index, item ->
+                    itemsIndexed(uiState.ingredients) { index, item ->
                         Row(
                             modifier = Modifier
                                 .padding(bottom = dimensionResource(id = R.dimen.dp8))
@@ -273,7 +305,7 @@ fun AddingARecipe(
                                 }
                             )
                             CancelButton {
-                                ingredientsList.removeAt(index)
+                                viewModel.removeIngredient(uiState.ingredients[index])
                             }
                         }
                     }
@@ -281,10 +313,10 @@ fun AddingARecipe(
                     item {
                         Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.dp8)))
                         AddAnIngredientOrAStepButton(
-                            isEnabled = ingredientsList.lastOrNull()?.name?.value?.isNotEmpty() == true ||
-                                    ingredientsList.size == 0
+                            isEnabled = uiState.ingredients.lastOrNull()?.name?.value?.isNotEmpty() == true ||
+                                    uiState.ingredients.isEmpty()
                         ) {
-                            ingredientsList.add(Ingredient())
+                            viewModel.addIngredient()
                         }
                     }
 
@@ -294,14 +326,14 @@ fun AddingARecipe(
                             text = stringResource(id = R.string.method),
                             style = Typography.titleMedium
                         )
-                        if (methodList.isNotEmpty()) {
+                        if (uiState.method.isNotEmpty()) {
                             Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.dp16)))
                         } else {
                             Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.dp8)))
                         }
                     }
 
-                    itemsIndexed(methodList) { index, item ->
+                    itemsIndexed(uiState.method) { index, item ->
                         Row(
                             modifier = Modifier
                                 .padding(bottom = dimensionResource(id = R.dimen.dp8))
@@ -317,7 +349,7 @@ fun AddingARecipe(
                                 }
                             )
                             CancelButton {
-                                methodList.removeAt(index)
+                                viewModel.removeMethodStep(uiState.method[index])
                             }
                         }
                     }
@@ -325,11 +357,11 @@ fun AddingARecipe(
                     item {
                         Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.dp8)))
                         AddAnIngredientOrAStepButton(
-                            isEnabled = methodList.lastOrNull()?.step?.value?.isNotEmpty() == true ||
-                                    methodList.size == 0,
+                            isEnabled = uiState.method.lastOrNull()?.step?.value?.isNotEmpty() == true ||
+                                    uiState.method.isEmpty(),
                             isIngredient = false,
                         ) {
-                            methodList.add(MethodStep())
+                            viewModel.addMethodStep()
                         }
                         Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.dp32)))
                     }

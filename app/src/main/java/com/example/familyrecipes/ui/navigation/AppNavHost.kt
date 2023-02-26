@@ -31,7 +31,6 @@ fun AppNavHost() {
                 content = {
                     MainScreen(
                         navController = navController,
-                        recipeList = TestDatabase.myRecipeList
                     )
                 })
             composable(
@@ -49,7 +48,6 @@ fun AppNavHost() {
                     AddingARecipe(
                         navController = navController,
                         onBackClick = {},
-                        onCompleteClick = {}
                     )
                 })
             composable(

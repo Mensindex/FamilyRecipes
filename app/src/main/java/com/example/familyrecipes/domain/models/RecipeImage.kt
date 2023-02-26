@@ -1,4 +1,4 @@
-package com.example.familyrecipes.data.models
+package com.example.familyrecipes.domain.models
 
 import android.graphics.Bitmap
 import android.net.Uri

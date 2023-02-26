@@ -1,6 +1,5 @@
 package com.example.familyrecipes.ui.screens.common
 
-import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,18 +20,16 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.familyrecipes.R
+import com.example.familyrecipes.domain.models.Recipe
 import com.example.familyrecipes.ui.theme.Heather
 import com.example.familyrecipes.ui.theme.Shapes
 import com.example.familyrecipes.ui.theme.SoftPeach
 import com.example.familyrecipes.ui.theme.Typography
-import java.time.LocalTime
 
 
 @Composable
 fun RecipeCard(
-    recipeName: String,
-    preparingTime: LocalTime,
-    recipeImage: Bitmap?,
+    recipe: Recipe,
     onClick: () -> Unit,
 ) {
     Card(
@@ -71,7 +68,7 @@ fun RecipeCard(
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.dp8))
             ) {
                 Text(
-                    text = recipeName,
+                    text = recipe.name,
                     maxLines = 1,
                     style = Typography.bodyLarge,
                     color = Color.Black,
@@ -90,21 +87,21 @@ fun RecipeCard(
                     Text(
                         modifier = Modifier
                             .padding(bottom = dimensionResource(id = R.dimen.dp2)),
-                        text = "${preparingTime.hour}h ${preparingTime.minute}m",
+                        text = "${recipe.preparingTime.hour}h ${recipe.preparingTime.minute}m",
                         style = Typography.labelMedium,
                         color = Heather,
                     )
                 }
             }
 
-            if (recipeImage != null) {
+            if (recipe.image != null) {
                 Image(
                     modifier = Modifier
                         .clip(Shapes.small)
                         .fillMaxHeight()
                         .width(72.dp)
                         .background(SoftPeach),
-                    bitmap = recipeImage.asImageBitmap(),
+                    bitmap = recipe.image.asImageBitmap(),
                     contentDescription = null,
                     contentScale = ContentScale.Fit
                 )

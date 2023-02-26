@@ -30,7 +30,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.familyrecipes.R
-import com.example.familyrecipes.data.models.Category
+import com.example.familyrecipes.domain.models.Category
 import com.example.familyrecipes.ui.screens.common.CreateACategoryField
 import com.example.familyrecipes.ui.screens.common.StrokeButton
 import com.example.familyrecipes.ui.theme.*
@@ -43,14 +43,15 @@ fun SelectACategoryPreview() {
             mutableStateListOf<Category>()
         },
         onSelectClick = {}
-    )
+    ){}
 }
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun SelectACategoryBottomSheet(
     onSelectClick: (() -> Unit)?,
-    categoryList: MutableList<Category>,
+    categoryList: List<Category>,
+    onAddCategory: (String) -> Unit,
 ) {
 
     var isAddACategoryClicked by remember { mutableStateOf(false) }
@@ -132,10 +133,7 @@ fun SelectACategoryBottomSheet(
             CreateACategoryField(
                 text = categoryNameText,
                 onAddClick = {
-                    categoryList.add(
-                        index = 0,
-                        Category(name = categoryNameText)
-                    )
+                    onAddCategory(categoryNameText)
                     categoryNameText = ""
                     isAddACategoryClicked = false
                 },
