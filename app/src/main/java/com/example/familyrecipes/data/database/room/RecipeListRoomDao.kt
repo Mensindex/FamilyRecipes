@@ -2,7 +2,7 @@ package com.example.familyrecipes.data.database.room
 
 import androidx.room.*
 import com.example.familyrecipes.data.entities.CategoryEntity
-import com.example.familyrecipes.domain.RecipeEntity
+import com.example.familyrecipes.data.entities.RecipeEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -18,7 +18,7 @@ interface RecipeListRoomDao {
     suspend fun addCategory(category: CategoryEntity)
 
     @Query(value = "SELECT * FROM recipes_table WHERE id=:recipeId LIMIT 1")
-    suspend fun getRecipe(recipeId: Int): RecipeEntity
+    fun getRecipe(recipeId: Int): Flow<RecipeEntity>
 
     @Query(value = "SELECT * FROM categories_table")
     fun getCategories(): Flow<List<CategoryEntity>>

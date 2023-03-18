@@ -17,9 +17,10 @@ import kotlinx.coroutines.flow.update
 import java.time.LocalTime
 
 class AddingARecipeViewModel(dao: RecipeListRoomDao) : ViewModel() {
+
     private val _addingARecipeUIState = MutableStateFlow(AddingARecipeUIState())
     val addingARecipeUIState = _addingARecipeUIState.asStateFlow()
-    private val addRecipe = AddRecipeUseCase(RecipeListRepositoryImpl(dao))
+    private val addRecipeUseCase = AddRecipeUseCase(RecipeListRepositoryImpl(dao))
 
     fun addCategory(name: String) {
         _addingARecipeUIState.update { currentState ->
@@ -30,18 +31,18 @@ class AddingARecipeViewModel(dao: RecipeListRoomDao) : ViewModel() {
         }
     }
 
-    fun addIngredient() {
+    fun addIngredient(name: String) {
         _addingARecipeUIState.update { currentState ->
             currentState.copy(
-                ingredients = currentState.ingredients.plus(Ingredient())
+                ingredients = currentState.ingredients.plus(Ingredient(name = mutableStateOf(name)))
             )
         }
     }
 
-    fun addMethodStep() {
+    fun addMethodStep(step:String) {
         _addingARecipeUIState.update { currentState ->
             currentState.copy(
-                method = currentState.method.plus(MethodStep())
+                method = currentState.method.plus(MethodStep(step = mutableStateOf(step)))
             )
         }
     }
@@ -75,7 +76,7 @@ class AddingARecipeViewModel(dao: RecipeListRoomDao) : ViewModel() {
     }
 
     suspend fun addRecipe(recipe: Recipe) {
-        addRecipe.addRecipe(recipe = recipe)
+        addRecipeUseCase.addRecipe(recipe = recipe)
     }
 
     fun setServings(servings: Int) {
@@ -88,7 +89,7 @@ class AddingARecipeViewModel(dao: RecipeListRoomDao) : ViewModel() {
 data class AddingARecipeUIState(
     val isLoading: Boolean = false,
     val error: String? = null,
-    val servings: Int? = null,
+    val servings: Int = 1,
     val timeValue: MutableState<LocalTime> = mutableStateOf(LocalTime.MIDNIGHT),
     val ingredients: List<Ingredient> = emptyList(),
     val categories: List<Category> = emptyList(),

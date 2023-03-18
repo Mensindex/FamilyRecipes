@@ -26,6 +26,7 @@ import com.example.familyrecipes.ui.screens.common.SmallCategoriesButton
 import com.example.familyrecipes.ui.theme.Heather
 import com.example.familyrecipes.ui.theme.Typography
 import com.example.familyrecipes.ui.theme.Verdigris
+import com.example.familyrecipes.utils.RECIPE_SCREEN_ARG_KEY
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -119,7 +120,7 @@ fun MainScreen(
                     items = uiState.listRecipe,
                     itemContent = { item ->
                         RecipeCard(
-                            onClick = { navController.navigate(route = NavRoute.RecipeRoute.route) },
+                            onClick = { navController.navigate(route = NavRoute.RecipeRoute.route.plus("/${item.id}")) },
                             recipe = item
                         )
                         Spacer(

@@ -1,8 +1,11 @@
 package com.example.familyrecipes.domain
 
+import com.example.familyrecipes.domain.models.Recipe
+import kotlinx.coroutines.flow.Flow
+
 class GetRecipeUseCase(private val recipeListRepository: RecipeListRepository) {
 
-    suspend fun getRecipe(id: Int) {
-        recipeListRepository.getRecipe(id = id)
+    fun getRecipe(id: Int):Flow<Recipe> {
+        return recipeListRepository.getRecipe(id = id)
     }
 }

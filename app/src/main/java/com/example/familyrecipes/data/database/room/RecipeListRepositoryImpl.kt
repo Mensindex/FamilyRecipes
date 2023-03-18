@@ -2,7 +2,9 @@ package com.example.familyrecipes.data.database.room
 
 import com.example.familyrecipes.data.entities.CategoryEntity
 import com.example.familyrecipes.data.entities.toCategory
-import com.example.familyrecipes.domain.*
+import com.example.familyrecipes.data.entities.toRecipe
+import com.example.familyrecipes.data.entities.toRecipeEntity
+import com.example.familyrecipes.domain.RecipeListRepository
 import com.example.familyrecipes.domain.models.Category
 import com.example.familyrecipes.domain.models.Recipe
 import kotlinx.coroutines.flow.Flow
@@ -37,8 +39,10 @@ class RecipeListRepositoryImpl(private val recipeListRoomDao: RecipeListRoomDao)
         recipeListRoomDao.updateRecipe(recipe = recipe.toRecipeEntity())
     }
 
-    override suspend fun getRecipe(id: Int) {
-        recipeListRoomDao.getRecipe(recipeId = id)
+    override fun getRecipe(id: Int): Flow<Recipe> {
+        return recipeListRoomDao.getRecipe(recipeId = id).map { recipeEntity ->
+            recipeEntity.toRecipe()
+        }
     }
 
     override fun getRecipeList(): Flow<List<Recipe>> {

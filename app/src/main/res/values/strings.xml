@@ -19,6 +19,7 @@
     <string name="select...">Select…</string>
     <string name="step">Step</string>
     <string name="category_name">Category name</string>
+    <string name="min_serving">1</string>
 
     //Label text
     <string name="all_recipes">All recipes</string>

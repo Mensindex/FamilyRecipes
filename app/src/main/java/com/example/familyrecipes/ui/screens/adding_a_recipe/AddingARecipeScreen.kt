@@ -1,5 +1,6 @@
 package com.example.familyrecipes.ui.screens.adding_a_recipe
 
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
@@ -39,6 +40,7 @@ import com.example.familyrecipes.ui.screens.adding_a_recipe.components.BottomShe
 import com.example.familyrecipes.ui.screens.adding_a_recipe.components.RecipeImage
 import com.example.familyrecipes.ui.screens.common.*
 import com.example.familyrecipes.ui.theme.Typography
+import com.example.familyrecipes.utils.MY_LOG
 import kotlinx.coroutines.launch
 import java.time.LocalTime
 
@@ -52,8 +54,7 @@ fun AddingARecipe(
     val context = LocalContext.current
     val uiState by viewModel.addingARecipeUIState.collectAsState()
     val focusManager = LocalFocusManager.current
-    //Preparation time
-//    val timeValue = remember { mutableStateOf(LocalTime.MIDNIGHT) }
+
     //TopBar animation
     val scrollBehavior = TopAppBarDefaults
         .exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
@@ -127,8 +128,7 @@ fun AddingARecipe(
                                                     recipeName.isNotEmpty() &&
                                                             categories.isNotEmpty() &&
                                                             method.isNotEmpty() &&
-                                                            ingredients.isNotEmpty() &&
-                                                            servings != null
+                                                            ingredients.isNotEmpty()
                                                 }) {
                                                 viewModel.viewModelScope.launch {
                                                     viewModel.addRecipe(
@@ -139,6 +139,7 @@ fun AddingARecipe(
                                                             categories = uiState.categories.map { category -> category.toCategoryEntity() },
                                                             ingredients = uiState.ingredients,
                                                             method = uiState.method,
+                                                            servings = uiState.servings
                                                         )
                                                     )
                                                 }
@@ -225,7 +226,7 @@ fun AddingARecipe(
                                         text = stringResource(id = R.string.serving),
                                         style = Typography.labelLarge
                                     )
-                                    ServingInputField() {
+                                    ServingInputField {
                                         viewModel.setServings(it.toInt())
                                     }
                                 }
@@ -316,7 +317,7 @@ fun AddingARecipe(
                             isEnabled = uiState.ingredients.lastOrNull()?.name?.value?.isNotEmpty() == true ||
                                     uiState.ingredients.isEmpty()
                         ) {
-                            viewModel.addIngredient()
+                            viewModel.addIngredient("")
                         }
                     }
 
@@ -361,7 +362,7 @@ fun AddingARecipe(
                                     uiState.method.isEmpty(),
                             isIngredient = false,
                         ) {
-                            viewModel.addMethodStep()
+                            viewModel.addMethodStep("")
                         }
                         Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.dp32)))
                     }

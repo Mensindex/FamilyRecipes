@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.familyrecipes.data.entities.CategoryEntity
-import com.example.familyrecipes.domain.RecipeEntity
+import com.example.familyrecipes.data.entities.RecipeEntity
 import com.example.familyrecipes.utils.RoomTypeConverter
 
 @Database(entities = [RecipeEntity::class, CategoryEntity::class], version = 1, exportSchema = false)

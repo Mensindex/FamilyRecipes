@@ -4,5 +4,5 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 
 data class MethodStep(
-    val step: MutableState<String> = mutableStateOf("")
+    var step: MutableState<String>
 )

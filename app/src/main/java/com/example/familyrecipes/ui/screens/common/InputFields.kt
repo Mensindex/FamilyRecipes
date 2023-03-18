@@ -30,8 +30,10 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.text.isDigitsOnly
 import com.example.familyrecipes.R
 import com.example.familyrecipes.ui.theme.*
+import com.example.familyrecipes.utils.MIN_SERVING
 
 @Preview(showBackground = true)
 @Composable
@@ -218,7 +220,9 @@ fun CreateACategoryField(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ServingInputField(onSuccess: (String) -> Unit) {
+fun ServingInputField(
+    onSuccess: (String) -> Unit,
+) {
     var servingText by remember { mutableStateOf("") }
     val focusManager = LocalFocusManager.current
     Row(
@@ -235,11 +239,14 @@ fun ServingInputField(onSuccess: (String) -> Unit) {
                 .weight(1f)
                 .focusRequester(remember { FocusRequester() }),
             value = servingText,
-            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+            keyboardActions = KeyboardActions(onDone = {
+                if (!servingText.isDigitsOnly()|| servingText == "0") servingText = ""
+                onSuccess(servingText.ifEmpty { MIN_SERVING })
+                focusManager.clearFocus()
+            }),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             onValueChange = {
                 servingText = it
-                onSuccess(it)
             },
             textStyle = Typography.bodyMedium,
             singleLine = true,
@@ -264,12 +271,13 @@ fun ServingInputField(onSuccess: (String) -> Unit) {
                     contentPadding = PaddingValues(0.dp),
                     placeholder = {
                         Text(
-                            text = stringResource(id = R.string.select___),
+                            text = MIN_SERVING,
                             style = Typography.bodyMedium,
                             color = Heather,
                         )
                     }
                 )
-            })
+            }
+        )
     }
 }

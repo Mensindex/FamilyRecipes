@@ -14,7 +14,7 @@ interface RecipeListRepository {
 
     suspend fun editRecipe(recipe: Recipe)
 
-    suspend fun getRecipe(id: Int)
+    fun getRecipe(id: Int): Flow<Recipe>
 
     fun getRecipeList(): Flow<List<Recipe>>
 

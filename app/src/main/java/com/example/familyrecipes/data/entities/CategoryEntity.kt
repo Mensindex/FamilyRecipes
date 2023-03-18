@@ -9,7 +9,7 @@ import com.example.familyrecipes.domain.models.Category
 @Entity(tableName = CATEGORY_TABLE_NAME)
 data class CategoryEntity(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = -1,
+    val id: Int = 0,
     @ColumnInfo(name = "category_name")
     val name: String,
 ){

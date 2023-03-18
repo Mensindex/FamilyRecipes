@@ -17,9 +17,7 @@ import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,9 +30,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.familyrecipes.App
 import com.example.familyrecipes.R
-import com.example.familyrecipes.domain.models.Recipe
 import com.example.familyrecipes.ui.screens.recipe.components.RecipeOptionsBottomSheet
 import com.example.familyrecipes.ui.theme.*
 import kotlinx.coroutines.launch
@@ -43,9 +42,12 @@ import kotlinx.coroutines.launch
 @Composable
 fun RecipeScreen(
     navController: NavHostController,
-    recipe: Recipe,
     onBackClick: () -> Unit,
+    viewModel: RecipeViewModel,
 ) {
+
+    val uiState by viewModel.recipeViewModelUIState.collectAsState()
+
 
     //TopBar animation
     val scrollBehavior = TopAppBarDefaults
@@ -93,8 +95,19 @@ fun RecipeScreen(
                     LargeTopAppBar(
                         modifier = Modifier,
                         title = {
+
                             Text(
-                                text = recipe.name,
+                                text = when (val r = uiState) {
+                                    is RecipeViewModelUIState.Error -> {
+                                        "Error"
+                                    }
+                                    is RecipeViewModelUIState.Loading -> {
+                                        ""
+                                    }
+                                    is RecipeViewModelUIState.RecipeUi -> {
+                                        r.recipe.name
+                                    }
+                                },
                                 style = Typography.headlineLarge,
                                 fontSize = topAppBarTextSize,
                             )
@@ -138,163 +151,176 @@ fun RecipeScreen(
                     )
                 },
             ) { innerPadding ->
-                LazyColumn(
-                    modifier = Modifier.padding(
-                        start = dimensionResource(id = R.dimen.dp16),
-                        end = dimensionResource(id = R.dimen.dp16),
-                        top = innerPadding.calculateTopPadding(),
-                        bottom = innerPadding.calculateBottomPadding(),
-                    )
-                ) {
-                    item {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = dimensionResource(id = R.dimen.dp16)),
-                        ) {
-                            //Recipe image
-                            Box(
-                                modifier = Modifier
-                                    .clip(Shapes.medium)
-                                    .height(242.dp)
-                                    .fillMaxWidth()
-                                    .background(SoftPeach)
-                            ) {
+                when (val state = uiState) {
+                    is RecipeViewModelUIState.Error -> {
 
-                                if (recipe.image == null) {
-                                    Image(
-                                        painter = painterResource(id = R.drawable.placeholder),
-                                        contentDescription = null,
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                    )
+                    }
+                    is RecipeViewModelUIState.Loading -> {
 
-                                } else {
-                                    Image(
-                                        modifier = Modifier
-                                            .fillMaxSize(),
-                                        bitmap = recipe.image.asImageBitmap(),
-                                        contentDescription = null,
-                                        contentScale = ContentScale.FillWidth
-                                    )
-                                }
-                            }
-                            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.dp16)))
-                            //Time$Serving
-                            Row(
-                                modifier = Modifier
-                                    .padding(bottom = dimensionResource(id = R.dimen.dp24)),
-                                horizontalArrangement = Arrangement
-                                    .spacedBy(dimensionResource(id = R.dimen.dp8)),
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                Row(
-                                    modifier = Modifier,
-                                    horizontalArrangement = Arrangement
-                                        .spacedBy(dimensionResource(id = R.dimen.dp2)),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                ) {
-                                    Image(
-                                        modifier = Modifier.size(dimensionResource(id = R.dimen.dp18)),
-                                        painter = painterResource(id = R.drawable.time),
-                                        contentDescription = null,
-                                        contentScale = ContentScale.Fit
-                                    )
-                                    Text(
-                                        text = "${recipe.preparingTime.hour}h " +
-                                                "${recipe.preparingTime.minute}m",
-                                        style = Typography.bodyMedium,
-                                        color = SecondaryText,
-                                    )
-                                }
-                                Divider(
-                                    color = CatskillWhite,
-                                    modifier = Modifier
-                                        .fillMaxHeight()
-                                        .width(dimensionResource(id = R.dimen.dp1))
-                                )
-                                Row(
-                                    modifier = Modifier,
-                                    horizontalArrangement = Arrangement
-                                        .spacedBy(dimensionResource(id = R.dimen.dp2)),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                ) {
-                                    Image(
-                                        modifier = Modifier.size(dimensionResource(id = R.dimen.dp18)),
-                                        painter = painterResource(id = R.drawable.dish),
-                                        contentDescription = null,
-                                        contentScale = ContentScale.Fit
-                                    )
-                                    Text(
-                                        text = "${recipe.servings} serving(s)",
-                                        style = Typography.bodyMedium,
-                                        color = SecondaryText,
-                                    )
-                                }
-                            }
-                            //Ingredients title
-                            Text(
-                                text = stringResource(id = R.string.ingredients),
-                                style = Typography.titleMedium
+                    }
+                    is RecipeViewModelUIState.RecipeUi -> {
+                        LazyColumn(
+                            modifier = Modifier.padding(
+                                start = dimensionResource(id = R.dimen.dp16),
+                                end = dimensionResource(id = R.dimen.dp16),
+                                top = innerPadding.calculateTopPadding(),
+                                bottom = innerPadding.calculateBottomPadding(),
                             )
-                        }
-                    }
-                    items(recipe.ingredients) { ingredient ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            Text(text = ingredient.name.value)
-                        }
-                    }
-                    item {
-                        Text(
-                            modifier = Modifier
-                                .padding(
-                                    top = dimensionResource(id = R.dimen.dp24),
-                                    bottom = dimensionResource(id = R.dimen.dp16),
-                                ),
-                            text = stringResource(id = R.string.method),
-                            style = Typography.titleMedium,
-                        )
-                    }
-                    itemsIndexed(recipe.method) { index, methodStep ->
-                        Column(
-                            modifier = Modifier
-                                .padding(bottom = dimensionResource(id = R.dimen.dp16)),
-                            verticalArrangement = Arrangement
-                                .spacedBy(dimensionResource(id = R.dimen.dp8)),
-                            horizontalAlignment = Alignment.Start
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .clip(Shapes.extraSmall)
-                                    .background(AlphaVerdigris)
-                                    .padding(
-                                        horizontal = dimensionResource(id = R.dimen.dp8),
-                                        vertical = dimensionResource(id = R.dimen.dp4)
-                                    ),
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
+                            item {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(bottom = dimensionResource(id = R.dimen.dp16)),
+                                ) {
+                                    //Recipe image
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(Shapes.medium)
+                                            .height(242.dp)
+                                            .fillMaxWidth()
+                                            .background(SoftPeach)
+                                    ) {
+
+                                        if (state.recipe.image == null) {
+                                            Image(
+                                                painter = painterResource(id = R.drawable.placeholder),
+                                                contentDescription = null,
+                                                modifier = Modifier
+                                                    .fillMaxSize()
+                                            )
+
+                                        } else {
+                                            Image(
+                                                modifier = Modifier
+                                                    .fillMaxSize(),
+                                                bitmap = state.recipe.image.asImageBitmap(),
+                                                contentDescription = null,
+                                                contentScale = ContentScale.FillWidth
+                                            )
+                                        }
+                                    }
+                                    Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.dp16)))
+                                    //Time$Serving
+                                    Row(
+                                        modifier = Modifier
+                                            .padding(bottom = dimensionResource(id = R.dimen.dp24)),
+                                        horizontalArrangement = Arrangement
+                                            .spacedBy(dimensionResource(id = R.dimen.dp8)),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                    ) {
+                                        Row(
+                                            modifier = Modifier,
+                                            horizontalArrangement = Arrangement
+                                                .spacedBy(dimensionResource(id = R.dimen.dp2)),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                        ) {
+                                            Image(
+                                                modifier = Modifier.size(dimensionResource(id = R.dimen.dp18)),
+                                                painter = painterResource(id = R.drawable.time),
+                                                contentDescription = null,
+                                                contentScale = ContentScale.Fit
+                                            )
+                                            Text(
+                                                text = "${state.recipe.preparingTime.hour}h " +
+                                                        "${state.recipe.preparingTime.minute}m",
+                                                style = Typography.bodyMedium,
+                                                color = SecondaryText,
+                                            )
+                                        }
+                                        Divider(
+                                            color = CatskillWhite,
+                                            modifier = Modifier
+                                                .fillMaxHeight()
+                                                .width(dimensionResource(id = R.dimen.dp1))
+                                        )
+                                        Row(
+                                            modifier = Modifier,
+                                            horizontalArrangement = Arrangement
+                                                .spacedBy(dimensionResource(id = R.dimen.dp2)),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                        ) {
+                                            Image(
+                                                modifier = Modifier.size(dimensionResource(id = R.dimen.dp18)),
+                                                painter = painterResource(id = R.drawable.dish),
+                                                contentDescription = null,
+                                                contentScale = ContentScale.Fit
+                                            )
+                                            Text(
+                                                text = "${state.recipe.servings} serving(s)",
+                                                style = Typography.bodyMedium,
+                                                color = SecondaryText,
+                                            )
+                                        }
+                                    }
+                                    //Ingredients title
+                                    Text(
+                                        text = stringResource(id = R.string.ingredients),
+                                        style = Typography.titleMedium
+                                    )
+                                }
+                            }
+                            items(state.recipe.ingredients) { ingredient ->
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    Text(text = ingredient.name.value)
+                                }
+                            }
+                            item {
                                 Text(
-                                    text = "Step ${index + 1}",
-                                    style = Typography.labelSmall,
-                                    color = Verdigris,
+                                    modifier = Modifier
+                                        .padding(
+                                            top = dimensionResource(id = R.dimen.dp24),
+                                            bottom = dimensionResource(id = R.dimen.dp16),
+                                        ),
+                                    text = stringResource(id = R.string.method),
+                                    style = Typography.titleMedium,
                                 )
                             }
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                Text(text = methodStep.step.value)
-                            }
-                        }
+                            itemsIndexed(state.recipe.method) { index, methodStep ->
+                                Column(
+                                    modifier = Modifier
+                                        .padding(bottom = dimensionResource(id = R.dimen.dp16)),
+                                    verticalArrangement = Arrangement
+                                        .spacedBy(dimensionResource(id = R.dimen.dp8)),
+                                    horizontalAlignment = Alignment.Start
+                                ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .clip(Shapes.extraSmall)
+                                            .background(AlphaVerdigris)
+                                            .padding(
+                                                horizontal = dimensionResource(id = R.dimen.dp8),
+                                                vertical = dimensionResource(id = R.dimen.dp4)
+                                            ),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                    ) {
+                                        Text(
+                                            text = "Step ${index + 1}",
+                                            style = Typography.labelSmall,
+                                            color = Verdigris,
+                                        )
+                                    }
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth(),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                    ) {
+                                        Text(text = methodStep.step.value)
+                                    }
+                                }
 
+                            }
+
+                        }
                     }
+
 
                 }
+
             }
         })
 }
