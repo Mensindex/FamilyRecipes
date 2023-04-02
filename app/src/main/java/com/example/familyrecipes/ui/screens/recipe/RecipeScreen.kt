@@ -30,9 +30,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.example.familyrecipes.App
 import com.example.familyrecipes.R
 import com.example.familyrecipes.ui.screens.recipe.components.RecipeOptionsBottomSheet
 import com.example.familyrecipes.ui.theme.*
@@ -153,7 +151,7 @@ fun RecipeScreen(
             ) { innerPadding ->
                 when (val state = uiState) {
                     is RecipeViewModelUIState.Error -> {
-
+                        Text(text = state.msg)
                     }
                     is RecipeViewModelUIState.Loading -> {
 
@@ -266,7 +264,7 @@ fun RecipeScreen(
                                         .fillMaxWidth(),
                                     verticalAlignment = Alignment.CenterVertically,
                                 ) {
-                                    Text(text = ingredient.name.value)
+                                    Text(text = ingredient.name)
                                 }
                             }
                             item {
@@ -309,7 +307,7 @@ fun RecipeScreen(
                                             .fillMaxWidth(),
                                         verticalAlignment = Alignment.CenterVertically,
                                     ) {
-                                        Text(text = methodStep.step.value)
+                                        Text(text = methodStep.step)
                                     }
                                 }
 

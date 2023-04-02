@@ -1,6 +1,5 @@
 package com.example.familyrecipes.ui.screens.adding_a_recipe
 
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
@@ -32,7 +31,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.familyrecipes.App
 import com.example.familyrecipes.R
-import com.example.familyrecipes.data.entities.toCategoryEntity
 import com.example.familyrecipes.domain.models.Recipe
 import com.example.familyrecipes.ui.navigation.NavRoute
 import com.example.familyrecipes.ui.screens.adding_a_recipe.components.BaseBottomSheet
@@ -40,7 +38,7 @@ import com.example.familyrecipes.ui.screens.adding_a_recipe.components.BottomShe
 import com.example.familyrecipes.ui.screens.adding_a_recipe.components.RecipeImage
 import com.example.familyrecipes.ui.screens.common.*
 import com.example.familyrecipes.ui.theme.Typography
-import com.example.familyrecipes.utils.MY_LOG
+import com.example.familyrecipes.utils.FILLING_ERROR
 import kotlinx.coroutines.launch
 import java.time.LocalTime
 
@@ -91,7 +89,7 @@ fun AddingARecipe(
                     timeValue = uiState.timeValue,
                     onSelectCategoryClick = { coroutineScope.launch { modalBottomSheetState.hide() } },
                     onSelectTimeClick = { coroutineScope.launch { modalBottomSheetState.hide() } },
-                    onAddCategory = { viewModel.addCategory(it) }
+                    onAddCategory = { coroutineScope.launch { viewModel.addCategory(it) } },
                 )
             }
         },
@@ -126,27 +124,29 @@ fun AddingARecipe(
                                         onClick = {
                                             if (with(uiState) {
                                                     recipeName.isNotEmpty() &&
-                                                            categories.isNotEmpty() &&
+                                                            categories.value.isNotEmpty() &&
                                                             method.isNotEmpty() &&
                                                             ingredients.isNotEmpty()
                                                 }) {
                                                 viewModel.viewModelScope.launch {
-                                                    viewModel.addRecipe(
-                                                        Recipe(
+                                                    viewModel.addRecipeWithCategories(
+                                                        recipe = Recipe(
                                                             name = uiState.recipeName,
                                                             image = uiState.recipeImage?.bitmap,
                                                             preparingTime = uiState.timeValue.value,
-                                                            categories = uiState.categories.map { category -> category.toCategoryEntity() },
                                                             ingredients = uiState.ingredients,
                                                             method = uiState.method,
                                                             servings = uiState.servings
-                                                        )
+                                                        ),
+                                                        categories = uiState.categories.value.filter {
+                                                            it.isChecked.value
+                                                        }
                                                     )
                                                 }
                                                 navController.navigate(route = NavRoute.MainRoute.route)
                                             } else Toast.makeText(
                                                 context,
-                                                "All fields must be filled",
+                                                FILLING_ERROR,
                                                 Toast.LENGTH_SHORT
                                             ).show()
 
@@ -204,7 +204,7 @@ fun AddingARecipe(
                                 )
                                 CustomInputField(
                                     text = uiState.recipeName,
-                                    onValueChange = {
+                                    onSuccess = {
                                         viewModel.setRecipeName(it)
                                     },
                                     hintText = stringResource(id = R.string.type_a_name),
@@ -262,7 +262,7 @@ fun AddingARecipe(
                                     style = Typography.labelLarge
                                 )
                                 CustomSelectTextField(
-                                    text = uiState.categories
+                                    text = uiState.categories.value
                                         .filter { it.isChecked.value }
                                         .joinToString(
                                             separator = stringResource(id = R.string.category_separator)
@@ -300,9 +300,10 @@ fun AddingARecipe(
                         ) {
                             CustomInputField(
                                 modifier = Modifier.weight(1f),
-                                text = item.name.value,
-                                onValueChange = {
-                                    item.name.value = it
+                                text = item.name,
+                                onSuccess = { inputString ->
+                                    item.name = inputString
+                                    uiState.ingredientFieldText.value = item.name
                                 }
                             )
                             CancelButton {
@@ -314,10 +315,11 @@ fun AddingARecipe(
                     item {
                         Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.dp8)))
                         AddAnIngredientOrAStepButton(
-                            isEnabled = uiState.ingredients.lastOrNull()?.name?.value?.isNotEmpty() == true ||
+                            isEnabled = uiState.ingredientFieldText.value.isNotEmpty() ||
                                     uiState.ingredients.isEmpty()
                         ) {
                             viewModel.addIngredient("")
+                            uiState.ingredientFieldText.value = ""
                         }
                     }
 
@@ -344,9 +346,10 @@ fun AddingARecipe(
                         ) {
                             CustomInputField(
                                 modifier = Modifier.weight(1f),
-                                text = item.step.value,
-                                onValueChange = {
-                                    item.step.value = it
+                                text = item.step,
+                                onSuccess = { inputString ->
+                                    item.step = inputString
+                                    uiState.methodFieldText.value = item.step
                                 }
                             )
                             CancelButton {
@@ -358,11 +361,12 @@ fun AddingARecipe(
                     item {
                         Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.dp8)))
                         AddAnIngredientOrAStepButton(
-                            isEnabled = uiState.method.lastOrNull()?.step?.value?.isNotEmpty() == true ||
+                            isEnabled = uiState.methodFieldText.value.isNotEmpty() ||
                                     uiState.method.isEmpty(),
                             isIngredient = false,
                         ) {
                             viewModel.addMethodStep("")
+                            uiState.methodFieldText.value = ""
                         }
                         Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.dp32)))
                     }

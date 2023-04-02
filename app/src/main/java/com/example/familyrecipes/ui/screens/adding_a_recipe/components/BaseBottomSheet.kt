@@ -11,7 +11,7 @@ import java.time.LocalTime
 fun BaseBottomSheet(
     bottomSheetType: BottomSheetType,
     onSelectCategoryClick: (() -> Unit)?,
-    categoryList: List<Category> = emptyList(),
+    categoryList: MutableState<List<Category>> = mutableStateOf(emptyList()),
     timeValue: MutableState<LocalTime> = remember {mutableStateOf(LocalTime.MIDNIGHT)},
     onSelectTimeClick: (() -> Unit)?,
     onAddCategory: (String) -> Unit

@@ -7,7 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetLayout
@@ -24,8 +24,11 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.familyrecipes.App
 import com.example.familyrecipes.R
+import com.example.familyrecipes.ui.navigation.NavRoute
 import com.example.familyrecipes.ui.screens.category_list.components.AddACategoryBottomSheet
 import com.example.familyrecipes.ui.screens.common.CategoryCard
 import com.example.familyrecipes.ui.theme.Typography
@@ -36,8 +39,10 @@ import kotlinx.coroutines.launch
 @Composable
 fun CategoryListScreen(
     navController: NavHostController,
+    viewModel: CategoryListViewModel = viewModel(factory = CategoryListViewModelFactory(App.dao)),
 ) {
-    val myCategoryList = mutableListOf("Breakfast", "Lunch", "Dinner")
+    val uiState by viewModel.categoryListUiState.collectAsState()
+
     //Animation
     var isClicked by remember { mutableStateOf(false) }
     val pulseAnimation by animateFloatAsState(
@@ -95,8 +100,15 @@ fun CategoryListScreen(
                         modifier = Modifier,
                         title = {
                             Text(
-                                text = stringResource(id = R.string.categories),
+                                text = if (uiState.loading) {
+                                    stringResource(id = R.string.empty_string)
+                                } else if (uiState.error != null) {
+                                    "${uiState.error}"
+                                } else {
+                                    stringResource(id = R.string.categories)
+                                },
                                 style = Typography.headlineLarge,
+                                fontSize = topAppBarTextSize,
                             )
                         },
                         actions = {
@@ -144,28 +156,42 @@ fun CategoryListScreen(
                     )
                 }
             ) { innerPadding ->
-                LazyColumn(
-                    modifier = Modifier
-                        .padding(
-                            start = dimensionResource(id = R.dimen.dp16),
-                            end = dimensionResource(id = R.dimen.dp16),
-                            top = innerPadding.calculateTopPadding(),
-                            bottom = innerPadding.calculateBottomPadding(),
-                        )
-                        .fillMaxWidth(),
-                    content = {
-                        items(
-                            items = myCategoryList,
-                            itemContent = { item ->
-                                CategoryCard(item)
-                                Spacer(
-                                    modifier = Modifier
-                                        .height(dimensionResource(id = R.dimen.dp12))
-                                )
-                            }
-                        )
-                    }
-                )
+
+                if (uiState.loading) {
+
+                } else if (uiState.error != null) {
+                    Text(text = uiState.error.orEmpty())
+                } else {
+                    LazyColumn(
+                        modifier = Modifier
+                            .padding(
+                                start = dimensionResource(id = R.dimen.dp16),
+                                end = dimensionResource(id = R.dimen.dp16),
+                                top = innerPadding.calculateTopPadding(),
+                                bottom = innerPadding.calculateBottomPadding(),
+                            )
+                            .fillMaxWidth(),
+                        content = {
+                            itemsIndexed(
+                                items = uiState.categories,
+                                itemContent = { index, category ->
+                                    CategoryCard(
+                                        categoryName = category.name,
+                                        recipeCount = uiState.recipeCounts[index],
+                                    ) {
+                                        navController.navigate(route = NavRoute.RecipeListRoute.route.plus(
+                                            "/${category.id}"
+                                        ))
+                                    }
+                                    Spacer(
+                                        modifier = Modifier
+                                            .height(dimensionResource(id = R.dimen.dp12))
+                                    )
+                                }
+                            )
+                        }
+                    )
+                }
             }
         })
 

@@ -24,13 +24,28 @@ class MainViewModel(dao: RecipeListRoomDao) : ViewModel() {
 
     private fun getAllRecipes() {
         viewModelScope.launch {
-            getRecipeListUseCase.getRecipeList().asResult().collect { result ->
+            getRecipeListUseCase().asResult().collect { result ->
                 when (result) {
-                    is Result.Error -> {}
-                    is Result.Loading -> {}
+                    is Result.Loading -> {
+                        _mainViewModelUIState.update { currentState ->
+                            currentState.copy(loading = true, error = null)
+                        }
+                    }
+                    is Result.Error -> {
+                        _mainViewModelUIState.update { currentState ->
+                            currentState.copy(
+                                error = result.exception?.message,
+                                loading = false
+                            )
+                        }
+                    }
                     is Result.Success -> {
                         _mainViewModelUIState.update { currentState ->
-                            currentState.copy(listRecipe = result.data)
+                            currentState.copy(
+                                loading = false,
+                                error = null,
+                                listRecipe = result.data
+                            )
                         }
                     }
                 }
@@ -40,5 +55,7 @@ class MainViewModel(dao: RecipeListRoomDao) : ViewModel() {
 }
 
 data class MainViewModelUIState(
+    val loading: Boolean = false,
+    val error: String? = null,
     val listRecipe: List<Recipe> = emptyList(),
 )

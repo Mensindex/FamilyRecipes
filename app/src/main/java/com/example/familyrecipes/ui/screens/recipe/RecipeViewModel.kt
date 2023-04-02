@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.familyrecipes.data.database.room.RecipeListRepositoryImpl
 import com.example.familyrecipes.data.database.room.RecipeListRoomDao
-import com.example.familyrecipes.domain.GetRecipeUseCase
+import com.example.familyrecipes.domain.GetARecipeUseCase
 import com.example.familyrecipes.domain.models.Recipe
 import com.example.familyrecipes.utils.Result
 import com.example.familyrecipes.utils.asResult
@@ -17,12 +17,12 @@ class RecipeViewModel(dao: RecipeListRoomDao) : ViewModel() {
     private val _recipeViewModelUIState =
         MutableStateFlow<RecipeViewModelUIState>(RecipeViewModelUIState.Loading)
     val recipeViewModelUIState = _recipeViewModelUIState.asStateFlow()
-    private val getRecipeUseCase = GetRecipeUseCase(RecipeListRepositoryImpl(dao))
+    private val getARecipeUseCase = GetARecipeUseCase(RecipeListRepositoryImpl(dao))
 
 
-    fun getRecipe(id: Int) {
+    fun getRecipe(id: Long) {
         viewModelScope.launch {
-            getRecipeUseCase.getRecipe(id).asResult().collect { result ->
+            getARecipeUseCase(id).asResult().collect { result ->
                 when (result) {
                     is Result.Error -> {
                         _recipeViewModelUIState.value =

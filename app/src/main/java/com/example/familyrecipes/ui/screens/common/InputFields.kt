@@ -28,30 +28,23 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.text.isDigitsOnly
 import com.example.familyrecipes.R
 import com.example.familyrecipes.ui.theme.*
 import com.example.familyrecipes.utils.MIN_SERVING
 
-@Preview(showBackground = true)
-@Composable
-fun TesttPreview() {
-    CustomSelectTextField() {
-
-    }
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomInputField(
     modifier: Modifier = Modifier,
-    text: String = stringResource(id = R.string.empty_string),
+    text: String,
     hintText: String = stringResource(id = R.string.select___),
     icon: @Composable (() -> Unit)? = null,
-    onValueChange: (String) -> Unit,
+    onSuccess: (String) -> Unit
 ) {
+
+    var inputText by remember { mutableStateOf(text) }
     val focusManager = LocalFocusManager.current
     Row(
         modifier = modifier
@@ -66,9 +59,14 @@ fun CustomInputField(
             modifier = Modifier
                 .weight(1f)
                 .focusRequester(remember { FocusRequester() }),
-            value = text,
-            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-            onValueChange = onValueChange,
+            value = inputText,
+            keyboardActions = KeyboardActions(onDone = {
+                focusManager.clearFocus()
+            }),
+            onValueChange = {
+                inputText = it
+                onSuccess(inputText)
+            },
             textStyle = Typography.bodyMedium,
             singleLine = true,
             cursorBrush = SolidColor(Verdigris),
@@ -81,7 +79,7 @@ fun CustomInputField(
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
                     ),
-                    value = text,
+                    value = inputText,
                     innerTextField = innerTextField,
                     enabled = true,
                     singleLine = true,
@@ -240,8 +238,8 @@ fun ServingInputField(
                 .focusRequester(remember { FocusRequester() }),
             value = servingText,
             keyboardActions = KeyboardActions(onDone = {
-                if (!servingText.isDigitsOnly()|| servingText == "0") servingText = ""
-                onSuccess(servingText.ifEmpty { MIN_SERVING })
+                if (!servingText.isDigitsOnly() || servingText == "0") servingText = ""
+                onSuccess(servingText.ifEmpty { MIN_SERVING.toString() })
                 focusManager.clearFocus()
             }),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -271,7 +269,7 @@ fun ServingInputField(
                     contentPadding = PaddingValues(0.dp),
                     placeholder = {
                         Text(
-                            text = MIN_SERVING,
+                            text = MIN_SERVING.toString(),
                             style = Typography.bodyMedium,
                             color = Heather,
                         )

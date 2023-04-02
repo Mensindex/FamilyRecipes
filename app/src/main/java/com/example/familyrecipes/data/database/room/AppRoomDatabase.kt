@@ -6,10 +6,11 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.familyrecipes.data.entities.CategoryEntity
+import com.example.familyrecipes.data.entities.RecipeCategoryCrossRef
 import com.example.familyrecipes.data.entities.RecipeEntity
 import com.example.familyrecipes.utils.RoomTypeConverter
 
-@Database(entities = [RecipeEntity::class, CategoryEntity::class], version = 1, exportSchema = false)
+@Database(entities = [RecipeEntity::class, CategoryEntity::class, RecipeCategoryCrossRef::class], version = 2, exportSchema = false)
 @TypeConverters(RoomTypeConverter::class)
 abstract class AppRoomDatabase : RoomDatabase() {
 
@@ -33,7 +34,9 @@ abstract class AppRoomDatabase : RoomDatabase() {
                     context = application,
                     klass = AppRoomDatabase::class.java,
                     name = DB_NAME,
-                ).build()
+                )
+//                    .fallbackToDestructiveMigration()
+                    .build()
                 INSTANCE = db
                 return db
             }

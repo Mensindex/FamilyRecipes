@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.familyrecipes.App
@@ -26,7 +27,6 @@ import com.example.familyrecipes.ui.screens.common.SmallCategoriesButton
 import com.example.familyrecipes.ui.theme.Heather
 import com.example.familyrecipes.ui.theme.Typography
 import com.example.familyrecipes.ui.theme.Verdigris
-import com.example.familyrecipes.utils.RECIPE_SCREEN_ARG_KEY
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,85 +54,119 @@ fun MainScreen(
             )
         }
     ) { innerPadding ->
-        LazyColumn(
-            modifier = Modifier
-                .padding(
-                    start = dimensionResource(id = R.dimen.dp16),
-                    end = dimensionResource(id = R.dimen.dp16),
-                    top = innerPadding.calculateTopPadding(),
-                    bottom = innerPadding.calculateBottomPadding(),
-                )
-                .fillMaxWidth(),
-            content = {
-                item {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.dp8))
+        if (uiState.loading) {
+            Text(
+                modifier = Modifier
+                    .padding(
+                        start = dimensionResource(id = R.dimen.dp16),
+                        end = dimensionResource(id = R.dimen.dp16),
+                        top = innerPadding.calculateTopPadding(),
+                        bottom = innerPadding.calculateBottomPadding(),
+                    ),
+                text = "LOADING...",
+                fontSize = 32.sp
+            )
+        } else if (uiState.error != null) {
+            Text(
+                modifier = Modifier
+                    .padding(
+                        start = dimensionResource(id = R.dimen.dp16),
+                        end = dimensionResource(id = R.dimen.dp16),
+                        top = innerPadding.calculateTopPadding(),
+                        bottom = innerPadding.calculateBottomPadding(),
+                    ),
+                text = uiState.error.orEmpty(),
+            )
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .padding(
+                        start = dimensionResource(id = R.dimen.dp16),
+                        end = dimensionResource(id = R.dimen.dp16),
+                        top = innerPadding.calculateTopPadding(),
+                        bottom = innerPadding.calculateBottomPadding(),
                     )
-                    {
-                        LargeAddButton {
-                            navController.navigate(route = NavRoute.AddingARecipeRoute.route)
+                    .fillMaxWidth(),
+                content = {
+                    item {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.dp8))
+                        )
+                        {
+                            LargeAddButton {
+                                navController.navigate(route = NavRoute.AddingARecipeRoute.route)
+                            }
+                            CustomInputField(
+                                modifier = Modifier.weight(0.7f),
+                                hintText = stringResource(id = R.string.search_a_recipe___),
+                                icon = {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.search),
+                                        contentDescription = null,
+                                        tint = Verdigris,
+                                        modifier = Modifier
+                                    )
+                                },
+                                text = "",
+                                onSuccess = {}
+                            )
                         }
-                        CustomInputField(
-                            modifier = Modifier.weight(0.7f),
-                            hintText = stringResource(id = R.string.search_a_recipe___),
-                            icon = {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.search),
-                                    contentDescription = null,
-                                    tint = Verdigris,
-                                    modifier = Modifier
-                                )
-                            },
-                            text = "",
-                            onValueChange = {}
-                        )
-                    }
-                    Spacer(
-                        modifier = Modifier
-                            .height(dimensionResource(id = R.dimen.dp24))
-                    )
-                }
-
-                item {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement
-                            .spacedBy(dimensionResource(id = R.dimen.dp16)),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text(
-                            modifier = Modifier.weight(1f),
-                            text = stringResource(id = R.string.all_recipes),
-                            style = Typography.labelLarge,
-                            color = Heather,
-                        )
-                        SmallCategoriesButton()
-                    }
-                    Spacer(
-                        modifier = Modifier
-                            .height(dimensionResource(id = R.dimen.dp16))
-                    )
-                }
-                items(
-                    items = uiState.listRecipe,
-                    itemContent = { item ->
-                        RecipeCard(
-                            onClick = { navController.navigate(route = NavRoute.RecipeRoute.route.plus("/${item.id}")) },
-                            recipe = item
-                        )
                         Spacer(
                             modifier = Modifier
-                                .height(dimensionResource(id = R.dimen.dp12))
+                                .height(dimensionResource(id = R.dimen.dp24))
                         )
-                    })
-                item {
-                    Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.dp16)))
-                }
+                    }
 
-            }
-        )
+                    item {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement
+                                .spacedBy(dimensionResource(id = R.dimen.dp16)),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(
+                                modifier = Modifier.weight(1f),
+                                text = stringResource(id = R.string.all_recipes),
+                                style = Typography.labelLarge,
+                                color = Heather,
+                            )
+                            SmallCategoriesButton {
+                                navController.navigate(route = NavRoute.CategoryListRoute.route)
+                            }
+                        }
+                        Spacer(
+                            modifier = Modifier
+                                .height(dimensionResource(id = R.dimen.dp16))
+                        )
+                    }
+                    items(
+                        items = uiState.listRecipe,
+                        itemContent = { item ->
+                            RecipeCard(
+                                onClick = {
+                                    navController.navigate(
+                                        route = NavRoute.RecipeRoute.route.plus(
+                                            "/${item.id}"
+                                        )
+                                    )
+                                },
+                                recipe = item
+                            )
+                            Spacer(
+                                modifier = Modifier
+                                    .height(dimensionResource(id = R.dimen.dp12))
+                            )
+                        })
+                    item {
+                        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.dp16)))
+                    }
+
+                }
+            )
+        }
+
     }
 }

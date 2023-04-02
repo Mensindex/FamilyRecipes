@@ -2,20 +2,15 @@ package com.example.familyrecipes.utils
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.util.Log
-import androidx.room.ProvidedTypeConverter
 import androidx.room.TypeConverter
 import com.example.familyrecipes.data.entities.CategoryEntity
+import com.example.familyrecipes.data.entities.RecipeEntity
 import com.example.familyrecipes.domain.models.Ingredient
 import com.example.familyrecipes.domain.models.MethodStep
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.io.ByteArrayOutputStream
-import java.lang.reflect.Type
 import java.time.LocalTime
-
-inline fun <reified T> Gson.fromJson(json: String, type: Type): T =
-    fromJson(json, object : TypeToken<T>() {}.type)
 
 class RoomTypeConverter {
 
@@ -33,9 +28,20 @@ class RoomTypeConverter {
     }
 
     @TypeConverter
+    fun fromRecipeToString(value: RecipeEntity): String =
+        Gson().toJson(value, object : TypeToken<RecipeEntity>() {}.type)
+
+    @TypeConverter
+    fun fromStringToRecipe(value: String): RecipeEntity? {
+        return try {
+            Gson().fromJson(value, object : TypeToken<RecipeEntity>() {}.type)
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    @TypeConverter
     fun fromListIngredientToString(value: List<Ingredient>): String {
-        Log.d(MY_LOG, "input list: $value")
-        Log.d(MY_LOG, "output list: ${Gson().toJson(value, object : TypeToken<List<Ingredient>>() {}.type)}")
         return Gson().toJson(value, object : TypeToken<List<Ingredient>>() {}.type)
     }
 

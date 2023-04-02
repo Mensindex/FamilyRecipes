@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 
 class GetRecipeListUseCase(private val recipeListRepository: RecipeListRepository) {
 
-    fun getRecipeList(): Flow<List<Recipe>> {
+    operator fun invoke(): Flow<List<Recipe>> {
         return recipeListRepository.getRecipeList()
     }
 }

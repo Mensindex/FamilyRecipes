@@ -27,7 +27,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.familyrecipes.R
 import com.example.familyrecipes.domain.models.Category
@@ -35,27 +34,27 @@ import com.example.familyrecipes.ui.screens.common.CreateACategoryField
 import com.example.familyrecipes.ui.screens.common.StrokeButton
 import com.example.familyrecipes.ui.theme.*
 
-@Preview(showBackground = true)
-@Composable
-fun SelectACategoryPreview() {
-    SelectACategoryBottomSheet(
-        categoryList = remember {
-            mutableStateListOf<Category>()
-        },
-        onSelectClick = {}
-    ){}
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun SelectACategoryPreview() {
+//    SelectACategoryBottomSheet(
+//        categoryList = remember {
+//            mutableStateListOf<Category>()
+//        },
+//        onSelectClick = {}
+//    ){}
+//}
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun SelectACategoryBottomSheet(
     onSelectClick: (() -> Unit)?,
-    categoryList: List<Category>,
+    categoryList: MutableState<List<Category>>,
     onAddCategory: (String) -> Unit,
 ) {
 
     var isAddACategoryClicked by remember { mutableStateOf(false) }
-    var categoryNameText by remember { mutableStateOf("") }
+    var categoryName by remember { mutableStateOf("") }
     Column(
         modifier = Modifier
             .background(color = Color.White),
@@ -96,7 +95,7 @@ fun SelectACategoryBottomSheet(
                     .clickable(
                         onClick = {
                             if (isAddACategoryClicked) {
-                                categoryNameText = ""
+                                categoryName = ""
                             }
                             isAddACategoryClicked = !isAddACategoryClicked
                         },
@@ -131,21 +130,21 @@ fun SelectACategoryBottomSheet(
 
         if (isAddACategoryClicked) {
             CreateACategoryField(
-                text = categoryNameText,
+                text = categoryName,
                 onAddClick = {
-                    onAddCategory(categoryNameText)
-                    categoryNameText = ""
+                    onAddCategory(categoryName)
+                    categoryName = ""
                     isAddACategoryClicked = false
                 },
-                onValueChange = { categoryNameText = it },
-                isAddEnabled = categoryNameText.isNotEmpty()
+                onValueChange = { categoryName = it },
+                isAddEnabled = categoryName.isNotEmpty()
             )
         }
 
         LazyColumn(
             modifier = Modifier,
             content = {
-                itemsIndexed(categoryList) { index, item ->
+                itemsIndexed(categoryList.value) { index, item ->
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -173,7 +172,7 @@ fun SelectACategoryBottomSheet(
                             )
                         )
                     }
-                    if (index < categoryList.size - 1) {
+                    if (index < categoryList.value.size - 1) {
                         Divider(color = CatskillWhite)
                     }
 
@@ -185,7 +184,7 @@ fun SelectACategoryBottomSheet(
                 .padding(dimensionResource(id = R.dimen.dp16))
         ) {
             StrokeButton(
-                enable = categoryList.any { it.isChecked.value },
+                enable = categoryList.value.any { it.isChecked.value },
                 label = stringResource(id = R.string.select),
                 onClick = { onSelectClick?.invoke() }
             )

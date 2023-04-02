@@ -68,7 +68,7 @@ fun AddACategoryBottomSheet(
             CustomInputField(
                 text = categoryNameText,
                 hintText = stringResource(id = R.string.category_name),
-                onValueChange = {
+                onSuccess = {
                     categoryNameText = it
                 }
             )

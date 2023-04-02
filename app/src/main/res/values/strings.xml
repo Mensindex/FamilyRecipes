@@ -38,6 +38,9 @@
     <string name="share">Share</string>
     <string name="delete">Delete</string>
 
+    //Error text
+    <string name="filling_error">"All fields must be filled"</string>
+
     <string name="price">%s$</string>
 
     //Other
